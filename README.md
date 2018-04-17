@@ -1,4 +1,5 @@
 # POS-01
+*****Description******
 A simple point of sale system with inventory system.
 
 List of programming language included
