@@ -8,6 +8,12 @@
     require_once '../../../Process/model.php';
     $confcred = $_POST['confcred'];
     $newcred = $_POST['newcred'];
-    $data = new UserModel();
-    $arr = $data->modelSettingCredential($confcred,$newcred);
+    
+    if(empty($newcred ) || empty($confcred)) {
+      header('Location: ../../../admin.php?home=empty');
+      exit();
+    } else {
+      $data = new UserModel();
+      $arr = $data->modelSettingCredential($confcred,$newcred);
+    }
   }

@@ -19,9 +19,9 @@
         
     </ul>
     <form class="form-inline my-2 my-lg-0">
-    <button class="btn btn-outline-success ml-2" id="signbtn"><i class="fas fa-user-plus"></i> Signup</button>
-        <button class="btn btn-outline-success ml-2" id="uloginbtn"><i class="fas fa-users"></i> User Login</button>
-        <button class="btn btn-outline-success ml-2" id="aloginbtn"><i class="fas fa-user-secret"></i> Admin Mode</button>
+        <button class="btn btn-outline-success ml-2" id="signbtn"><i class="fas fa-user-plus faa-pulse animated"></i> Signup</button>
+        <button class="btn btn-outline-success ml-2" id="uloginbtn"><i class="fas fa-users faa-pulse animated"></i> User Login</button>
+        <button class="btn btn-outline-success ml-2" id="aloginbtn"><i class="fas fa-user-secret faa-pulse animated"></i> Admin Mode</button>
     </form>
   </div>
 </nav>

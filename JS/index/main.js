@@ -6,10 +6,21 @@ import {SignUp,UserLogIn,AdminLogIn,RemoveAll} from './util.js';
     let signbtn = document.querySelector('#signbtn');
     let uloginbtn = document.querySelector('#uloginbtn');
     let aloginbtn = document.querySelector('#aloginbtn');
+    let cross = document.querySelector('#cross');
+    let close = document.querySelector('.close');
 
     let showA = true;
     let showB = true;
     let showC = true;
+
+    if(close != null) {
+        close.addEventListener('click',function(x){
+            x.preventDefault();
+            cross.style.display = 'none';
+        });
+    }
+
+ 
  
     signbtn.addEventListener('click',function(x){
         x.preventDefault();
@@ -59,4 +70,5 @@ import {SignUp,UserLogIn,AdminLogIn,RemoveAll} from './util.js';
 
 
 
-
+   
+   

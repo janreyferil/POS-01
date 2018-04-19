@@ -9,8 +9,19 @@ if(!isset($_POST['update'])) {
     $uid = $_POST['uid'];
     $cpwd = $_POST['cpwd'];
     $npwd = $_POST['npwd'];
-    $data = new UserModel();
-    $arr = $data->modelSetting($uid,$cpwd,$npwd);
+
+    if(empty($uid) || empty($cpwd) || empty($npwd)) {
+        if(!isset($_SESSION['u_id'])) {
+            header('Location: ../../../admin.php?home=empty');
+            exit();
+        } elseif(!isset($_SESSION['a_id'])) {
+           header('Location: ../../../user.php?home=empty');
+           exit();
+        }
+    } else {
+        $data = new UserModel();
+        $arr = $data->modelSetting($uid,$cpwd,$npwd);
+    }
 }
 
 

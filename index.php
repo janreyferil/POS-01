@@ -9,7 +9,8 @@ session_start();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="CSS/lib/bootstrap.css">
-    <link rel="stylesheet" href="CSS\lib\fontawesome\web-fonts-with-css\css\fontawesome-all.min.css">
+    <link rel="stylesheet" href="CSS/lib/fontawesome/web-fonts-with-css/css/fontawesome-all.min.css">
+    <link rel="stylesheet" href="CSS/lib/fontawesome/web-fonts-with-css/css/font-awesome-animation.css">
     <title>Home Page</title>
 
 </head>
@@ -24,20 +25,21 @@ session_start();
         }
         else {
         include_once 'layout/navbar.php';
-        echo '<div class="container-fluid mt-3 mb-3">
-
-        <div id="signup">
+        echo '<div class="container mt-3 mb-3">';
+        include_once 'HTTP/GET/validate.php';
+        echo '<div id="signup">
         </div>
         <div id="ulogin">
         </div>
         <div id="alogin">
         </div>
         </div>';
-        echo '<script src="JS/index/main.js" type="module"></script>';
+        echo '<script type="module" src="JS/index/main.js"></script>';
+        echo '<script type="text/javascript module" src="JS/index/sample.php"></script>';
         }
+        echo '<div class="container">';
         require_once 'HTTP/POST/users/adminsignup.php'; 
-
 ?>
-
+        </div>
 </body>
 </html>

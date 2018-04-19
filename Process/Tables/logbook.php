@@ -7,7 +7,8 @@ trait LogBook
     
     public function TimeIn($conn,$id){
         $login = date('F d Y h:i A');
-        $logout = '';
+        $logout = 'Not Log out';
+
         $sql = "INSERT INTO logbook(role_id,login,logout) VALUES(?,?,?);";
         $stmt = $conn->stmt_init();
         if(!$stmt->prepare($sql)) {
@@ -23,12 +24,12 @@ trait LogBook
     }
 
     public function Count($conn){
-        $sql = "SELECT * FROM logbook ORDER BY id DESC LIMIT 1;";
+        $sql = "SELECT * FROM logbook ORDER BY log_id DESC LIMIT 1;";
         $result = $conn->query($sql);
         $tproduct =[];
         while ($row = $result->fetch_assoc())
         {
-           $id = $row['id'];
+           $id = $row['log_id'];
         }
           return $id;
     }
@@ -36,7 +37,7 @@ trait LogBook
     public function TimeOut($conn) {
         $cont = $this->Count($conn);
         $logout = date('F d Y h:i A');
-        $sql = "UPDATE logbook SET logout = ? WHERE id=?;";
+        $sql = "UPDATE logbook SET logout = ? WHERE log_id =?;";
         $stmt = $conn->stmt_init();
         if(!$stmt->prepare($sql)){
             die('Error with SQL');
@@ -50,35 +51,65 @@ trait LogBook
         }
     }
 
-    public function FetchTime($conn,$s,$r){
+    public function FetchTime($conn,$s,$r,$o,$ord){
+        $val = mysqli_real_escape_string($conn,$o);
+        if($ord == true) {
         $sql = "SELECT * 
         FROM users 
         INNER JOIN logbook 
         ON users.id = logbook.role_id 
         INNER JOIN roles ON logbook.role_id = roles.user_id
-        WHERE users.username LIKE '$s%' AND roles.role = '$r' ORDER BY logbook.login DESC;";
-        $result = $conn->query($sql);
+        WHERE users.username LIKE '$s%' AND roles.role = '$r' ORDER BY logbook.log_id DESC LIMIT ?;";
 
-        $data = [];
-        $name = [];
-        $login = [];
-        $logout = [];
-        if($result->num_rows > 0) {
-            while($row = $result->fetch_assoc()){
-                $combine = $row['user_fn']. ' ' . $row['user_ln'];
-                array_push($name,$combine);
-                array_push($login,$row['login']);
-                array_push($logout,$row['logout']);
-              }
-              $data = array("name"=>$name,"login"=>$login,"logout"=>$logout);
-              
-              echo json_encode($data);
+        }else {
+        $sql = "SELECT * 
+        FROM users 
+        INNER JOIN logbook 
+        ON users.id = logbook.role_id 
+        INNER JOIN roles ON logbook.role_id = roles.user_id
+        WHERE users.username LIKE '$s%' AND roles.role = '$r' ORDER BY logbook.log_id ASC LIMIT ?;";
+
+        }
+
+        $stmt = $conn->stmt_init();
+        if(!$stmt->prepare($sql)) {
+            die('Error with SQL');
+            exit();
         } else {
-            array_push($name,'No Seach Found');
-            array_push($logout,'No Seach Found');
-            array_push($login,'No Seach Found');
-            $data = array("name"=>$name,"login"=>$login,"logout"=>$logout);
-            echo json_encode($data);
+            if($o == '') {
+                $val = 5;
+            }
+            $stmt->bind_param('i',$val);
+            if(!$stmt->execute()) {
+            die('Error with Execution');
+            exit();
+            } else {
+                $result = $stmt->get_result();
+                $data = [];
+                $id = [];
+                $name = [];
+                $login = [];
+                $logout = [];
+                if($result->num_rows > 0) {
+                    while($row = $result->fetch_assoc()){
+                        $combine = $row['user_fn']. ' ' . $row['user_ln'];
+                        array_push($id,$row['log_id']);
+                        array_push($name,$combine);
+                        array_push($login,$row['login']);
+                        array_push($logout,$row['logout']);
+                      }
+                      $data = array("id"=>$id,"name"=>$name,"login"=>$login,"logout"=>$logout);
+                      
+                      echo json_encode($data);
+                } else {
+                    array_push($id,'No Seach Found');
+                    array_push($name,'No Seach Found');
+                    array_push($logout,'No Seach Found');
+                    array_push($login,'No Seach Found');
+                    $data = array("id"=>$id,"name"=>$name,"login"=>$login,"logout"=>$logout);
+                    echo json_encode($data);
+                }
+            }
         }
     }
 
@@ -91,6 +122,23 @@ trait LogBook
         $datas = ['time' => $time,'date'=>$date,'day'=>$actualDay];
         return json_encode($datas);
 
+    }
+
+    public function DeleteTime($conn,$id) {
+
+        $id = $conn->real_escape_string($id);
+        $sql = "DELETE FROM logbook WHERE log_id = ?;";
+        $stmt = $conn->stmt_init();
+        if(!$stmt->prepare($sql)){
+            die('Error with SQL');
+            exit();
+        } else {
+            $stmt->bind_param('i',$id);
+            if(!$stmt->execute()){
+                die('Error with Execution');
+                exit();
+            } 
+        }
     }
 }
 

@@ -49,12 +49,14 @@ class UserModel extends Model {
         $conn = $this->connection();
         if(!isset($_SESSION['u_id'])) {
             $id = $_SESSION['a_id'];
-            $this->Setting($conn,$id,$uid,$cpwd,$npwd);
+            $header =  header("Location: ../../../admin.php?home=password");
+            $this->Setting($conn,$id,$uid,$cpwd,$npwd,$header);
             header("Location: ../../../admin.php?update=success");
             exit();
         } elseif(!isset($_SESSION['a_id'])) {
           $id = $_SESSION['u_id'];
-          $this->Setting($conn,$id,$uid,$cpwd,$npwd);
+          $header =  header("Location: ../../../user.php?home=password");
+          $this->Setting($conn,$id,$uid,$cpwd,$npwd,$header);
           header("Location: ../../../user.php?update=success");
           exit();
         }
@@ -93,17 +95,22 @@ class LogBookModel extends Model {
       $this->TimeOut($conn);
   }
 
-  public function modelUserFetchTime($search,$role) {
+  public function modelUserFetchTime($search,$role,$offset,$order) {
     $conn = $this->connection();
-    $this->FetchTime($conn,$search,$role);
+    $this->FetchTime($conn,$search,$role,$offset,$order);
   }
 
   public function modelClock(){
      echo $this->Clock();
   }
 
+  public function modelDeleteTime($id) {
+      $conn = $this->connection();
+      $this->DeleteTime($conn,$id);
+  }
+
 }
 
-$new = new UserModel();
-
+$new = new LogBookModel();
+//$new->modelUserFetchTime('','user',20,true);
 //$new->modelSettingCredential('','123456');

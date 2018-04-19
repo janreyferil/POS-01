@@ -13,11 +13,18 @@ if(!isset($_POST['signup'])) {
     $fn = ucwords($_POST['fn']);
     $ln = ucwords($_POST['ln']);
     $role = 'user';
-    if(empty($uid) || empty($pwd)) {
-        header("Location: ../../../admin.php?signup=empty");
+
+    if(empty($fn) || empty($ln) || empty($uid) || empty($pwd) || empty($cred)) {
+        header("Location: ../../../?home=empty");
         exit();
-    } else {
-        $data = new UserModel();
-        $data->modelRegisUser($uid,$pwd,$role,$cred,$fn,$ln);
+    }else {
+        if(!preg_match("/[A-Za-z ]+/",$fn) || !preg_match("/[A-Za-z0-9]+/",$ln)) {
+            header("Location: ../../../?home=mismatch");
+            exit();
+        } else {
+            $data = new UserModel();
+            $data->modelRegisUser($uid,$pwd,$role,$cred,$fn,$ln);
+        }
+      
     }
 }

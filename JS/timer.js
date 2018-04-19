@@ -2,12 +2,13 @@
   function clock(timer){
     let xhr = new XMLHttpRequest();
 
-    xhr.open('GET','HTTP/POST/logbooks/clock.php',true);
+    xhr.open('GET','HTTP/GET/logbooks/clock.php',true);
     xhr.onload = function(){
       if(xhr.status == 200) {
         data = JSON.parse(xhr.responseText);
-        timer.innerHTML = 'Time: ' + data.time + '<br>' +
-        ' Date: ' + data.day + ', ' + data.date;
+        timer.innerHTML = `<h5 style="text-align: right;" class="text-light">
+        <i class="fas fa-hourglass-half faa-spin animated faa-fast"></i> 
+        ${data.time} ${data.day}, ${data.date} </h5>`;
       }
     }
     xhr.send();
@@ -21,4 +22,6 @@
 
 clock(timer);
 setInterval(start,1000);
+
+
 

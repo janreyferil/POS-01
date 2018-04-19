@@ -4,5 +4,5 @@ function doUnload(){
         xhr.open('GET','HTTP/POST/users/logout.php','true');
         xhr.send(); 
         console.log('Logout');
-    
+
   }

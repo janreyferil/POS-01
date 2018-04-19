@@ -10,6 +10,11 @@ if(!isset($_POST['alogin'])) {
     $uid = $_POST['uid'];
     $pwd = $_POST['pwd'];
 
-    $data = new UserModel();
-    $data->modelLoginAdmin($uid,$pwd);
+    if(empty($uid) || empty($pwd)) {
+        header('Location: ../../../?home=empty');
+        exit(); 
+    } else {
+        $data = new UserModel();
+        $data->modelLoginAdmin($uid,$pwd);
+    }
 }

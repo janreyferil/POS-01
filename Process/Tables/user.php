@@ -34,7 +34,7 @@
                         $stmtDef->execute();
                         $this->roleUser($conn,$uid,$r);
                         $this->Credential($conn,$r);
-                        echo "<h1>Admin account was created and the default value of the username,password and credential are admin.</h1>";
+                        echo '<h1 class="text-success text-center">Admin account was created and the default value of the username,password and credential are admin.</h1>';
                         exit();
                     }
                 }
@@ -66,37 +66,37 @@
                            $checkCred = password_verify($c,$row['credential']);
                     }
                         if($checkCred == false){
-                            header("Location: ../../../?signup=credential");
+                            header("Location: ../../../?home=credential");
                             exit();
                         } elseif($checkCred == true) {
                             
                             $sqlExist = "SELECT * FROM users WHERE username = ?;";
                             $stmtExist = $conn->stmt_init();
                             if(!$stmtExist->prepare($sqlExist)) {
-                                header("Location: ../../../?signup=error");
+                                die('Error with SQL');
                                 exit();
                             } else {
                                 $stmtExist->bind_param('s',$uid);
                                 if(!$stmtExist->execute()) {
-                                    header("Location: ../../../?signup=error");
+                                    die('Error with Execution');
                                     exit();
                                 } else {
                                     $result = $stmtExist->get_result();
                                     if($result->num_rows == 1) {
-                                        header("Location: ../../../?signup=taken");
+                                        header("Location: ../../../?home=taken");
                                         exit();
                                     } else {
                                         $sql = "INSERT INTO users(user_fn,user_ln,username,password,created_at,updated_at) VALUES(?,?,?,?,?,?);";
                                         $stmt = $conn->stmt_init();
                                         if(!$stmt->prepare($sql)) {
-                                            header("Location: ../../../?signup=error");
+                                            die('Error with SQL');
                                             exit();
                                         } else {
                                             $hashpwd = password_hash($pwd,PASSWORD_DEFAULT);
                                             $stmt->bind_param('ssssss',$fn,$ln,$uid,$hashpwd,$created_at,$updated_at);
                                             $stmt->execute();
                                             $this->roleUser($conn,$uid,$r);
-                                            header("Location: ../../../?signup=success");
+                                            header("Location: ../../../?home=signup");
                                             exit();
                                           }
                                     }
@@ -188,18 +188,17 @@
             $sql = "SELECT * FROM users WHERE username=?;";
             $stmt = $conn->stmt_init();
             if(!$stmt->prepare($sql)) {
-                header("Location: ../../?login=error");
+                die('Error with SQL');
                 exit();
             } else {
                 $stmt->bind_param('s',$uid);
                 if(!$stmt->execute()) {
-                    header("Location: ../../?login=error");
+                   die('Error with Execution');
                     exit();
                 } else {
                     $result = $stmt->get_result();
                     if(!$result->num_rows >= 1) {
-                       
-                        header("Location: ../../../?login=username");
+                        header("Location: ../../../?home=username");
                         exit();
                     } else {
                         if($row = $result->fetch_assoc()) {
@@ -207,7 +206,7 @@
                             $verify = password_verify($pwd,$row['password']);
                         }
                         if($verify == false) {
-                            header("Location: ../../../?login=password");
+                            header("Location: ../../../?home=password");
                             exit();  
                         } elseif($verify == true) {
                            $sqlRole = "SELECT * FROM roles WHERE user_id = ?;";
@@ -229,12 +228,12 @@
                                     if($role == 'admin') {
                                         $_SESSION['a_id'] = $id;
                                         $this->TimeIn($conn,$id);
-                                        header("Location: ../../../admin.php?login=success");
+                                        header("Location: ../../../admin.php?home=success");
                                         exit();  
                                     } elseif($role == 'user'){
                                         $_SESSION['u_id'] = $id;
                                         $this->TimeIn($conn,$id);
-                                        header("Location: ../../../user.php?login=success");
+                                        header("Location: ../../../user.php?home=success");
                                         exit();  
                                     }
                                 }
@@ -273,7 +272,7 @@
             }
         }
 
-        public function Setting($conn,$sid,$u,$p,$n) {
+        public function Setting($conn,$sid,$u,$p,$n,$h) {
             $uid = mysqli_real_escape_string($conn,$u);
             $confpwd = mysqli_real_escape_string($conn,$p);
             $newpwd =  mysqli_real_escape_string($conn,$n);
@@ -296,7 +295,7 @@
                             $id = $row['id'];
                             $checkPwd = password_verify($confpwd,$row['password']);
                             if($checkPwd == false) {
-                                header("Location: ../../../admin.php?admin=password");
+                                $h;
                                 exit();  
                             } elseif($checkPwd == true) {
                                 $sql = "UPDATE users SET username = ?,password = ?,updated_at = ?  WHERE id = ?;";
