@@ -7,6 +7,12 @@ class Model extends Database {
     use Users;
     use LogBook;
     use Supplier;
+    use Announcement;
+    use Todo;
+
+    public function __construct() {
+        date_default_timezone_set("Asia/Manila");
+    }
         
 }
 
@@ -28,7 +34,8 @@ class UserModel extends Model {
 
     public function modelLoginAdmin($uid,$pwd) {
         $conn = $this->connection();
-        $this->Login($conn,$uid,$pwd);
+        $role = 'admin';
+        $this->Login($conn,$uid,$pwd,$role);
     }
 
     public function modelFetch() {
@@ -68,9 +75,10 @@ class UserModel extends Model {
         return  $this->SettingCredential($conn,$sessionID,$ccred,$ncred);
     }
 
-    public function modelLoginUser() {
+    public function modelLoginUser($uid,$pwd) {
         $conn = $this->connection();
-        $this->Login($conn,$uid,$pwd);
+        $role = 'user';
+        $this->Login($conn,$uid,$pwd,$role);
     }
 
     
@@ -108,9 +116,61 @@ class LogBookModel extends Model {
       $conn = $this->connection();
       $this->DeleteTime($conn,$id);
   }
-
 }
 
-$new = new LogBookModel();
+class AnnouncementModel extends Model {
+    public function modelCreateAnnounce ($title,$body){
+        $conn = $this->connection();
+        $this->createAnnounce($conn,$title,$body);
+    }
+
+    public function modelFetchAnnounce (){
+        $conn = $this->connection();
+       $this->FetchAnnounce($conn);
+    }
+
+    public function modelEditAnnounce($id,$title,$body){
+        $conn = $this->connection();
+        $this->EditAnnounce($conn,$id,$title,$body);
+    }
+
+    public function modelDeleteAnnounce($id) {
+        $conn = $this->connection();
+        $this->DeleteAnnounce($conn,$id);
+    }
+}
+
+class TodoModel extends Model {
+
+    public function modelTodoFetch(){
+        $conn = $this->connection();
+        if(isset($_SESSION['u_id'])) {
+            $id = $_SESSION['u_id'];
+        }
+        $this->FetchTodo($conn,$id);
+    }
+
+    public function modelTodoCreate($body) {
+        $conn = $this->connection();
+        if(isset($_SESSION['u_id'])) {
+            $id = $_SESSION['u_id'];
+        }
+        $this->CreateTodo($conn,$id,$body);
+    }
+
+    public function modelDeleteTodo($id) {
+        $conn = $this->connection();
+        $this->DeleteTodo($conn,$id);
+    }
+}
+
+$new = new TodoModel();
+//$new->modelDeleteTodo(2);
+//$new->modelTodoCreate('Hello I am Janrey from SoftJan');
+
+//$new->modelTodoFetch();
+//$new->modelDeleteAnnounce(40);
+//$new->modelCreateAnnounce('janrey','hello guys');
+
 //$new->modelUserFetchTime('','user',20,true);
 //$new->modelSettingCredential('','123456');

@@ -5,10 +5,7 @@
     exit(); 
    } else {
     require_once '../../../Process/model.php';
-    $data = new LogBookModel();
     $id = $_POST['hid'];
-    $data->modelDeleteTime($id);
+    $data = new AnnouncementModel();
+    $data->modelDeleteAnnounce($id);
    }
-
-
-

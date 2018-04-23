@@ -23,22 +23,37 @@ session_start();
         header('Location: user.php');
         exit();
         }
+
         else {
         include_once 'layout/navbar.php';
         echo '<div class="container mt-3 mb-3">';
         include_once 'HTTP/GET/validate.php';
-        echo '<div id="signup">
+           
+        echo '
+        <div id="signup">
         </div>
         <div id="ulogin">
         </div>
         <div id="alogin">
         </div>
-        </div>';
-        echo '<script type="module" src="JS/index/main.js"></script>';
-        echo '<script type="text/javascript module" src="JS/index/sample.php"></script>';
+        <div class="card text-white border-success mb-3" style="max-width: 40rem;">
+            <div class="card-header"><div id="anno"></div></div>
+            <div class="card-body">
+        <div id="announce"></div>
+        </div>
+        </div>
+        </div>
+        <form method="POST" action="">
+        <input type="hidden" name="cannot">
+        </form>';
+        echo '<script src="JS/index/main.js"></script>';
         }
         echo '<div class="container">';
-        require_once 'HTTP/POST/users/adminsignup.php'; 
+        require_once 'Process/model.php';
+
+        $role = 'admin';
+        $data = new UserModel();
+        $data->modelAdminDefault($role);
 ?>
         </div>
 </body>

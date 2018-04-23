@@ -19,6 +19,7 @@
         
     </ul>
     <div class="form-inline my-2 my-lg-0">
+    <div class="float-right form-inline text-success ml-3" id="timer"></div>
     <button class="btn btn-outline-success ml-2" id="user"><i class="fas fa-cog faa-spin animated faa-slow mr-2 mb-1"></i>Account Setting</button>
     <form action="HTTP\POST\users\logout.php" method="POST">
     <button class="btn btn-outline-success ml-2" type="submit" name="logout"><i class="fas fa-sign-out-alt faa-passing animated mr-3 mb-1"></i> Log out</button>

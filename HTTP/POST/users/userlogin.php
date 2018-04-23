@@ -18,6 +18,6 @@ if(!isset($_POST['ulogin'])) {
     } else {
 
     $data = new UserModel();
-    $data->modelLoginAdmin($uid,$pwd);
+    $data->modelLoginUser($uid,$pwd);
     }
 }

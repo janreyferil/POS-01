@@ -1,16 +1,14 @@
 <?php 
    
-     /* if(!isset($_POST['logout'])) {
+     if(!isset($_POST['logout'])) {
         header('Location: ../../../');
         exit(); 
-      } else {        } */
+      } else {     
+        require_once '../../../Process/model.php';
+        $time = new LogBookModel();
+        $time->modelTimeOut();
+        } 
 
-      require_once '../../../Process/model.php';
-      $time = new LogBookModel();
-      $time->modelTimeOut();    
-      session_start();
-      session_unset();
-      session_destroy();
-      header('Location: ../../../');
-      exit();    
+
+
 ?>

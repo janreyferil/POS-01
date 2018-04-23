@@ -181,17 +181,22 @@
             }
         }
 
-        public function Login($conn,$u,$p) {
+        public function Login($conn,$u,$p,$r) {
+
             $uid = mysqli_real_escape_string($conn,$u);
             $pwd = mysqli_real_escape_string($conn,$p);
+      
+                $sql = "SELECT * FROM users
+                INNER JOIN roles ON users.id = roles.user_id
+                WHERE users.username = ? AND roles.role = ?;";
 
-            $sql = "SELECT * FROM users WHERE username=?;";
+           // $sql = "SELECT * FROM users WHERE username=?;";
             $stmt = $conn->stmt_init();
             if(!$stmt->prepare($sql)) {
                 die('Error with SQL');
                 exit();
             } else {
-                $stmt->bind_param('s',$uid);
+                $stmt->bind_param('ss',$uid,$r);
                 if(!$stmt->execute()) {
                    die('Error with Execution');
                     exit();

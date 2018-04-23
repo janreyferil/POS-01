@@ -17,6 +17,8 @@
     ?>
     </title>
     <link rel="stylesheet" href="CSS/lib/bootstrap.css">
+    <script src="JS/lib/jquery-3.2.1.min.js"></script>
+    <script src="JS/lib/bootstrap.min.js"></script>
     <link rel="stylesheet" href="CSS/lib/fontawesome/web-fonts-with-css/css/fontawesome-all.min.css">
     <link rel="stylesheet" href="CSS/lib/fontawesome/web-fonts-with-css/css/font-awesome-animation.css">
 </head>
@@ -29,15 +31,38 @@
             include_once 'layout/adminnavbar.php';
             echo '<div class="container">';
             include_once 'HTTP/GET/validate.php';
+            
             echo '
             <div id="go"></div>
             <div id="status"></div>
             <input type="hidden" id="username" value="'.$username.'">
             <div id="setting"></div>
+            <div class="card border-success mt-3 mb-3" style="max-width: 54rem;">
+            <div class="card-header text-success">
 
+            <div id="popShow" class="float-right form-inline text-success">
+            <i class="fas fa-newspaper ml-3 mr-2 mb-1"></i><h5 class="noselect mt-1">Announcement</h5>
+            </div>
+
+            <div id="popCreate" class="float-right form-inline text-success">
+            <i class="fas fa-plus ml-3 mr-2 mb-1"></i><h5 class="noselect mt-1">Create</h5>
+            </div>
+
+            <h1><b>Create Announcement<b></h1>
+            </div>
+            <div class="card-body">
+            <div class="text-light" id="createAnn"></div>
+            </div>
+
+            </div>
             <div class="card border-success mt-3 mb-3" style="max-width: 54rem;">
             <div class="card-header">
-            <div class="float-right" id="timer"></div>
+            <div id="userlogbook" class="float-right form-inline text-success">
+            <i class="fas fa-book ml-3 mr-2 mb-1"></i><h5 class="noselect mt-1">User Logbook</h5>
+            </div>
+            <div id="adminlogbook" class="float-right form-inline text-success">
+            <i class="fas fa-book ml-3 mr-2 mb-1"></i><h5 class="noselect mt-1">Admin Logbook</h5>
+            </div>
             <h1 class="text-success"><b>Logbook</b></h1>
             </div>
 
@@ -66,14 +91,11 @@
                     </form>
              </div>
        
-
-
-            
             <div id="userfetchtime"></div>   
             <div id="adminfetchtime"></div>
             </div>
             </div>
-            
+            <div class="modal fade" id="del"></div>
             </div>';
             echo '<script src="JS/timer.js"></script>';
             echo '<script src="JS/admin/main.js"></script>';

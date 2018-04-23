@@ -35,6 +35,7 @@ trait LogBook
     }
 
     public function TimeOut($conn) {
+
         $cont = $this->Count($conn);
         $logout = date('F d Y h:i A');
         $sql = "UPDATE logbook SET logout = ? WHERE log_id =?;";
@@ -47,6 +48,12 @@ trait LogBook
             if(!$stmt->execute()){
                 die('Error with Execution');
                 exit();
+            } else {
+                session_start();
+                session_unset();
+                session_destroy();
+                header('Location: ../../../');
+                exit();  
             }
         }
     }
@@ -102,7 +109,7 @@ trait LogBook
                       
                       echo json_encode($data);
                 } else {
-                    array_push($id,'No Seach Found');
+                    array_push($id,0);
                     array_push($name,'No Seach Found');
                     array_push($logout,'No Seach Found');
                     array_push($login,'No Seach Found');
@@ -117,7 +124,7 @@ trait LogBook
         $time = date('h:i:s A');
         $date = date('F d Y');
         $day = date('w');
-        $list = ['Default','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+        $list = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
         $actualDay = $list[$day];
         $datas = ['time' => $time,'date'=>$date,'day'=>$actualDay];
         return json_encode($datas);

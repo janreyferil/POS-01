@@ -20,11 +20,25 @@
         role_id
         credential
 
+        admin_announce
+        ann_id
+        title
+        body
+        created_at
+        updated_at
+
         logbook
         id
         role_id
         login
         logout
+
+        todo
+        id
+        user_id
+        body
+        created_at
+        updated_at
 
         supplier_person 
         id
@@ -44,6 +58,8 @@
         user_id
         supp_id
         supp_date
+
+
 
         
      */

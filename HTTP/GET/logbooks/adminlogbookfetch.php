@@ -1,6 +1,13 @@
 <?php 
 
-require_once '../../../Process/model.php';
+
+    if(!isset($_POST['search']) || !isset($_POST['val']) || !isset($_POST['order'])) {
+        header('Location: ../../../');
+        exit(); 
+    } else {
+
+        require_once '../../../Process/model.php';
+
         $search = $_POST['search'];
         $val = $_POST['val']; 
 
@@ -15,4 +22,6 @@ require_once '../../../Process/model.php';
         $data = new LogBookModel();
         $role = 'admin';
         $data->modelUserFetchTime($search,$role,$val,$order);
+    }
+       
 ?>
