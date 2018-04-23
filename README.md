@@ -1,20 +1,21 @@
 # POS-01
-*****Description******
-A simple point of sale system with inventory system.
+<center><h2><b>A simple point of sale system with inventory system.<b></h2></center>
 
-List of programming language included
--Javascript
--PHP
 
-Framework
--Bootstrap
+<h5>List of programming language included</h5>
+<p>-Javascript</p>
+<p>-PHP</p>
 
-Web Technologies
--Ajax
--Fetch
+<h5>Framework</h5>
+<p>-Bootstrap</p>
+<p>-Jquery</p>
 
-toolkit
--Fontawesome
+<h5>Web Technologies</h5>
+<p>-Ajax</p>
+<p>-Fetch</p>
+
+<h5>Toolkit</h5>
+<p>-Fontawesome</p>
 
 
 
