@@ -41,23 +41,47 @@
         updated_at
 
         supplier_person 
-        id
-        supp_fn
-        supp_ln
+        person_id
+        user_id
+        fn
+        ln
+        company
+        contact
         created_at
         updated_at
 
-        supplier_product
+        supplier_supply
         id
-        supp_code
-        supp_product
-        supp_quantity
+        supply_id
+        stock
+        created_at
+        updated_at
         
         suppplier_transac
         id
-        user_id
-        supp_id
-        supp_date
+        transac_id
+        supp_user_id    -- user
+        supp_product_id -- supplier_product
+        quantity
+        unit_price
+        created_at
+        updated_at
+    
+        inventory_category
+        category_id
+        category_name
+        created_at
+
+        inventory_product
+        inventory_id
+        supp_product_id
+        inventory_category_id
+        code
+        name
+        price
+        created_at
+        updated_at
+
 
 
 

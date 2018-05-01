@@ -345,7 +345,7 @@ function EditAnnounce(id) {
         <label for="exampleInputEmail1"><b>Body</b></label>
         <textarea class="form-control" type="text" name="body" id="body">${d.body[i]}</textarea>
         </div>
-        <input type="submit" name="submit" class="form-control btn btn-outline-light">
+        <input type="submit" name="submit" class="form-control btn btn-outline-light" value="Submit">
         <input type="button" class="form-control btn btn-outline-secondary mt-2" onclick="FetchAnnounce()" value="Cancel">
         </form>`;
         createAnn.innerHTML = output;
@@ -398,7 +398,7 @@ function CreateAnnouncement() {
   <label for="exampleInputEmail1"><b>Body</b></label>
   <textarea class="form-control" type="text" name="body" id="body"></textarea>
   </div>
-  <input type="submit" name="submit" class="form-control btn btn-outline-light">
+  <input type="submit" value="Submit" name="submit" class="form-control btn btn-outline-light">
   </form>`;
 
   let annForm = document.querySelector('#annForm');

@@ -74,7 +74,7 @@ trait Todo
 
     public function FetchTodo($conn,$id){
 
-        $sql = "SELECT * FROM todo WHERE user_id = ?;";
+        $sql = "SELECT * FROM todo WHERE user_id = ? GROUP BY id DESC;";
         $stmt = $conn->stmt_init();
         if(!$stmt->prepare($sql)) {
             die($stmt->error);

@@ -45,24 +45,20 @@
             include_once 'HTTP/GET/validate.php';
             echo '
             <div id="status"></div>
+            <div class="float-right mb-2 text-success" id="timer"></div>
+            <br>
+            <br>
             <input type="hidden" id="username" value="'.$username.'">
+            
             <div id="setting"></div>
-            <div class="card text-white border-success mb-3" style="max-width: 25rem;">
-            <div class="card-header">
-            <i class="float-right faa-shake animated-hover mt-4 fa fa-plus-square fa-2x " id="create"></i>
-            <i class="float-right mt-4 mr-4 fas fa-eye faa-burst animated-hover faa-fast fa-2x" id="show"></i>
-            <h1><b><i class="fas fa-clipboard-list fa-lg mt-3 faa-wrench animated"></i> To-Do List</b></h1></div>
-            <div class="card-body">
-            <div id="todo"></div>
-            </div>
-            </div> 
-     
+            <div id="mainElement"></div>
+            <div id="showSupplier"></div>
             
             <div class="modal fade" id="del">
-        </div>';
+             </div>';
             echo '<script src="JS/timer.js"></script>';
             echo '<script src="JS/user/main.js"></script>';
-            echo '<script src="JS/user/todo.js"></script>';
+            echo '<script src="JS/user/app.js"></script>';
         }
     ?>
 </body>

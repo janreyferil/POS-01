@@ -1,14 +1,14 @@
 <?php 
 
-
+session_start();
 require_once 'config.php';
 
 class Model extends Database {
     use Users;
     use LogBook;
-    use Supplier;
     use Announcement;
     use Todo;
+    use Supplier;
 
     public function __construct() {
         date_default_timezone_set("Asia/Manila");
@@ -164,13 +164,26 @@ class TodoModel extends Model {
     }
 }
 
-$new = new TodoModel();
-//$new->modelDeleteTodo(2);
-//$new->modelTodoCreate('Hello I am Janrey from SoftJan');
+class SupplierModel extends Model {
+    public function modelSupplierPerson($fn,$ln,$company,$contact) {
+        $conn = $this->connection();
+        $id = $_SESSION['u_id'];
+        $this->SupplierPerson($conn,$id,$fn,$ln,$company,$contact);
+    }
 
-//$new->modelTodoFetch();
-//$new->modelDeleteAnnounce(40);
-//$new->modelCreateAnnounce('janrey','hello guys');
+    public function modelSupplierSupplyID($s_id) {
+        $conn = $this->connection();
+        $this->SupplierSupplyID($conn,$s_id);
+    }
 
-//$new->modelUserFetchTime('','user',20,true);
-//$new->modelSettingCredential('','123456');
+    public function modelSupplierSupply($supply_id,$person_name,$quantity,$unit_price) {
+        $conn = $this->connection();
+        $id = $_SESSION['u_id'];
+        $this->SupplierSupply($conn,$person_name,$id,$supply_id,$quantity,$unit_price);
+    }
+}
+
+$new = new SupplierModel();
+//$new->modelSupplierSupplyID('a2310');
+$new->modelSupplierSupply('A2310','Jose Manalo',200,2300);
+

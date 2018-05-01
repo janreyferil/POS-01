@@ -14,7 +14,7 @@ let click = true;
   } 
 
 
-  function UserSetting(setting) {
+function UserSetting(setting) {
     getData('GET','HTTP/GET/users/status.php')
     .then(data => {
       let parseData = JSON.parse(data);
