@@ -1,6 +1,6 @@
 <?php 
 
-session_start();
+//session_start();
 require_once 'config.php';
 
 class Model extends Database {
@@ -171,19 +171,25 @@ class SupplierModel extends Model {
         $this->SupplierPerson($conn,$id,$fn,$ln,$company,$contact);
     }
 
-    public function modelSupplierSupplyID($s_id) {
+    public function modelSupplierSupplyID($s_id,$ref_name) {
         $conn = $this->connection();
-        $this->SupplierSupplyID($conn,$s_id);
+        $this->SupplierSupplyID($conn,$s_id,$ref_name);
     }
 
-    public function modelSupplierSupply($supply_id,$person_name,$quantity,$unit_price) {
+    public function modelSupplierSupply($person_name,$supply_id,$quantity,$unit_price) {
         $conn = $this->connection();
         $id = $_SESSION['u_id'];
         $this->SupplierSupply($conn,$person_name,$id,$supply_id,$quantity,$unit_price);
     }
+
+    public function modelFetchSupplierName(){
+        $conn = $this->connection();
+        $this->FetchSupplierName($conn);
+    }
 }
 
 $new = new SupplierModel();
-//$new->modelSupplierSupplyID('a2310');
-$new->modelSupplierSupply('A2310','Jose Manalo',200,2300);
+//$new->modelFetchSupplierName();
+//$new->modelSupplierSupplyID('a5310','mang juan');
+//$new->modelSupplierSupply('A2310','Jose Manalo',400,2300);
 

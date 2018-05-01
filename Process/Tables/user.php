@@ -2,7 +2,7 @@
 
     trait Users
     {   
-        public function adminDefault($conn,$r) {
+        protected function adminDefault($conn,$r) {
             $uid = 'admin';
             $pwd = 'admin';
             $fn = 'Admin';
@@ -41,7 +41,7 @@
              } }
         }
         
-        public function regisUser($conn,$u,$p,$r,$c,$f,$n) {
+        protected function regisUser($conn,$u,$p,$r,$c,$f,$n) {
             $uid = mysqli_real_escape_string($conn,$u);
             $pwd = mysqli_real_escape_string($conn,$p);
             $fn = mysqli_real_escape_string($conn,$f);
@@ -106,7 +106,7 @@
             } } }
         }
 
-        public function roleUser($conn,$u,$r) {
+        protected function roleUser($conn,$u,$r) {
             $sql = "SELECT * FROM users WHERE username = ?;";
 
             $stmt = $conn->stmt_init();
@@ -141,7 +141,7 @@
             }
         }
 
-        public function Credential($conn,$role) {
+        protected function Credential($conn,$role) {
             $sql = "SELECT * FROM roles WHERE role = ?;";
             $stmt = $conn->stmt_init();
             $updated_at = date('m/d/Y h:i A');
@@ -181,7 +181,7 @@
             }
         }
 
-        public function Login($conn,$u,$p,$r) {
+        protected function Login($conn,$u,$p,$r) {
 
             $uid = mysqli_real_escape_string($conn,$u);
             $pwd = mysqli_real_escape_string($conn,$p);
@@ -250,7 +250,7 @@
             } 
         }
 
-        public function Fetch($conn,$id) {
+        protected function Fetch($conn,$id) {
             $sql = "SELECT * FROM users WHERE id = ?;";
             $stmt = $conn->stmt_init();
             if(!$stmt->prepare($sql)) {
@@ -277,7 +277,7 @@
             }
         }
 
-        public function Setting($conn,$sid,$u,$p,$n,$h) {
+        protected function Setting($conn,$sid,$u,$p,$n,$h) {
             $uid = mysqli_real_escape_string($conn,$u);
             $confpwd = mysqli_real_escape_string($conn,$p);
             $newpwd =  mysqli_real_escape_string($conn,$n);
@@ -323,7 +323,7 @@
             }    
         }
 
-        public function SettingCredential($conn,$sid,$c,$n) {
+        protected function SettingCredential($conn,$sid,$c,$n) {
             $confcred = mysqli_real_escape_string($conn,$c);
             $newcred = mysqli_real_escape_string($conn,$n);
             $updated_at = date('m/d/Y h:i A');
@@ -370,7 +370,7 @@
             }
         }
 
-        public function Status($conn,$id){
+        protected function Status($conn,$id){
             $sql = "SELECT * FROM users WHERE id = ?;";
             $stmt = $conn->stmt_init();
             if(!$stmt->prepare($sql)) {

@@ -6,7 +6,7 @@
 trait Todo
 {
     
-    public function timeAgo($time_ago) {
+    protected function timeAgo($time_ago) {
         $time_ago = strtotime($time_ago);
         $cur_time   = time();
         $time_elapsed   = $cur_time - $time_ago;
@@ -72,7 +72,7 @@ trait Todo
         }
     }
 
-    public function FetchTodo($conn,$id){
+    protected function FetchTodo($conn,$id){
 
         $sql = "SELECT * FROM todo WHERE user_id = ? GROUP BY id DESC;";
         $stmt = $conn->stmt_init();
@@ -112,7 +112,7 @@ trait Todo
         }
     }
 
-    public function CreateTodo($conn,$id,$b) {
+    protected function CreateTodo($conn,$id,$b) {
         $body = $conn->real_escape_string($b);
         $sql = "INSERT INTO todo(user_id,body) VALUES(?,?);";
         $stmt = $conn->stmt_init();
@@ -130,7 +130,7 @@ trait Todo
         }
     }   
 
-    public function DeleteTodo($conn,$id) {
+    protected function DeleteTodo($conn,$id) {
         $sql = "DELETE FROM todo WHERE id =?;";
         $stmt = $conn->stmt_init();
         if(!$stmt->prepare($sql)) {

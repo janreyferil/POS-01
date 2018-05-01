@@ -267,14 +267,17 @@ class Supplier {
   </div>
 
   <div class="card-body">
-  <div class="mb-1 mt-1" id="message"></div>
   <div class="mb-1 mt-1" id="options"></div>
+  <br>
+  <br>
+  <div id="message"></div>
   <div id="supplier"></div>
   </div>
   </div>`;
  }
 
  static RegisterPerson() {
+    supplier.innerHTML = '';
     options.innerHTML = '';
     message.innerHTML = '';
     Supplier.formSupplierPerson();
@@ -288,6 +291,7 @@ class Supplier {
  static RegisterStock() {
    supplier.innerHTML = '';
    message.innerHTML = '';
+   Supplier.formSupplierSupply();
    options.innerHTML = `<div onclick="Supplier.formSupplierTransac()" class="float-right form-inline text-primary">
    <i class="fas fa-hand-holding-usd ml-2 mb-1"></i><h5 class="noselect mt-1">Transaction</h5>
    </div>
@@ -299,6 +303,109 @@ class Supplier {
 
    create.classList.remove('faa-horizontal');
    create.classList.remove('animated');
+ }
+ 
+ static formSupplierPerson() {
+      message.innerHTML = '';
+      supplier.innerHTML = '';
+      supplier.innerHTML = `
+      <form id="cSupplier" class="text-success">
+      <center><h1><b>Add a supplier information</b></h1></center>
+      <div class="form-group">
+      <label for="exampleInputEmail1"><b>First Name</b></label>
+      <input type="text" class="form-control" id="first" name="first" placeholder="Required a maximum of 30 value">
+      </div>
+      <div class="form-group">
+      <label for="exampleInputEmail1"><b>Last Name</b></label>
+      <input type="text" class="form-control" id="last" name="last" placeholder="Required a maximum of 30 value">
+      </div>
+      <div class="form-group">
+      <label for="exampleInputEmail1"><b>Company Name</b></label>
+      <input type="text" class="form-control" id="company" name="company" placeholder="Required a maximum of 30 value">
+      </div>
+      <div class="form-group">
+      <label for="exampleInputEmail1"><b>Contact Number</b></label>
+      <input type="text" class="form-control" id="contact" name="contact" placeholder="eg. 0926214112 exactly 11 value only">
+      </div>
+      <input type="submit" class="form-control btn btn-outline-success" name="submit" value="Submit">
+      </form>`;
+
+      const cSupplier = document.querySelector('#cSupplier');
+
+      cSupplier.addEventListener('submit',function(x){
+        x.preventDefault();
+        Supplier.registerSupplier();
+      })
+ }
+
+ static formSupplierSupply() {
+  message.innerHTML = '';
+  supplier.innerHTML = '';
+  supplier.innerHTML = `
+  <form id="SuppSupply" class="text-primary">
+  <center><h1><b>Add new supplier ID</b></h1></center>
+  <div class="form-group">
+  <label for="exampleInputEmail1"><b>Supply ID</b></label>
+  <input type="text" class="form-control" id="supply_id" name="supply_id" placeholder="Required an exactly 5 value">
+  </div>
+  <div class="form-group">
+  <label for="exampleInputEmail1"><b>Reference Name</b></label>
+  <input type="text" class="form-control" id="ref_name" name="ref_name" placeholder="Required a maximun of 25 value">
+  </div>
+  <input type="submit" class="form-control btn btn-outline-primary" name="submit" value="Submit">
+  </form>`;
+  const SuppSupply = document.querySelector('#SuppSupply');
+
+  SuppSupply.addEventListener('submit',function(x){
+    x.preventDefault();
+    Supplier.registerSupplyID();
+  });
+ }
+
+ static formSupplierTransac() {
+  message.innerHTML = '';
+  supplier.innerHTML = '';
+  supplier.innerHTML += `<form id="SuppTransac" class="text-primary">
+  <center><h1><b>Supplier Transaction</b></h1></center>
+  <div class="form-group">
+  <label for="exampleInputEmail1"><b>Supplier's Name</b></label>
+  <select class="form-control" name="supply_name" id="supply_name">
+  </select>
+  </div>
+  <div class="form-group">
+  <label for="exampleInputEmail1"><b>Supply ID</b></label>
+  <input type="text" class="form-control" id="supply_id" name="supply_id" placeholder="Required an exactly 5 value">
+  </div>
+
+  <div class="form-group">
+  <label for="exampleInputEmail1"><b>Quantity</b></label>
+  <input type="text" class="form-control" id="quantity" name="quantity" placeholder="Required a maximum of 10 value">
+  </div>
+
+  <div class="form-group">
+  <label for="exampleInputEmail1"><b>Unit Price</b></label>
+  <input type="text" class="form-control" id="unit_price" name="unit_price" placeholder="Required a maximum of 10 value">
+  </div>
+
+  <input type="submit" class="form-control btn btn-outline-primary" name="submit" value="Submit">
+  </form>`;
+  const supply_name = document.querySelector('#supply_name');
+  Main.getData('GET','HTTP/GET/supplier/suppliernamefetch.php')
+  .then((data)=>{
+   let list = JSON.parse(data);
+   const supply_name = document.querySelector('#supply_name');
+   for(let i = 0;i < list.name.length;i++) {
+     supply_name.innerHTML += `<option value="${list.name[i]}">${list.name[i]}</option>`;
+   }
+   });
+
+    const SuppTransac = document.querySelector('#SuppTransac');
+
+    SuppTransac.addEventListener('submit',function(x){
+      x.preventDefault();
+      Supplier.suppyTransac();
+    });
+    
  }
 
  static registerSupplier() {
@@ -322,7 +429,9 @@ class Supplier {
       } 
       else if(data == 'cannot') {
         message.innerHTML = `<center><h3 class="text-danger"><b>Please do not include any special character or not required character in specific form</b></h3></center>`;
-      } 
+      } else if(data == 'count') {
+        message.innerHTML = `<center><h3 class="text-danger"><b>Please follow the requirement of the fields</b></h3></center>`;
+      }
   })
   .catch((err)=>{
     console.log(err);
@@ -330,69 +439,71 @@ class Supplier {
 
  }
 
- static formSupplierPerson() {
-      supplier.innerHTML = `
-      <form id="cSupplier" class="text-success">
-      <center><h1><b>Add a supplier information</b></h1></center>
-      <div class="form-group">
-      <label for="exampleInputEmail1"><b>First Name</b></label>
-      <input type="text" class="form-control" id="first" name="first">
-      </div>
-      <div class="form-group">
-      <label for="exampleInputEmail1"><b>Last Name</b></label>
-      <input type="text" class="form-control" id="last" name="last">
-      </div>
-      <div class="form-group">
-      <label for="exampleInputEmail1"><b>Company Name</b></label>
-      <input type="text" class="form-control" id="company" name="company">
-      </div>
-      <div class="form-group">
-      <label for="exampleInputEmail1"><b>Contact Number</b></label>
-      <input type="text" class="form-control" id="contact" name="contact">
-      </div>
-      <input type="submit" class="form-control btn btn-outline-success" name="submit" value="Submit">
-      </form>`;
+ static registerSupplyID() {
 
-      const cSupplier = document.querySelector('#cSupplier');
+  const supply_id = document.querySelector('#supply_id').value;
+  const ref_name = document.querySelector('#ref_name').value;
 
-      cSupplier.addEventListener('submit',function(x){
-        x.preventDefault();
-        Supplier.registerSupplier();
-      })
+  let params = ['supply_id=',supply_id,'&ref_name=',ref_name];
+  
+  Main.postData('POST','HTTP/POST/supplier/suppliersupply_id.php',params)
+  .then((data)=>{
+
+    if(data == 'success') {
+      message.innerHTML = '';
+      supplier.innerHTML = `<center><h1 class="text-info"><b>The supply was added</b></h1></center>
+        <input type="button" class="form-control btn btn-outline-secondary mt-2" value="Back to Supply ID" onclick="Supplier.formSupplierSupply()">`;
+      // console.log(xhr.responseText);
+      } else if(data == 'empty') {
+        message.innerHTML = `<center><h3 class="text-danger"><b>Please fill up all information because they are required</b></h3></center>`;
+      } 
+      else if(data == 'cannot') {
+        message.innerHTML = `<center><h3 class="text-danger"><b>Please do not include any letters</b></h3></center>`;
+      } else if(data == 'taken') {
+        message.innerHTML = `<center><h3 class="text-danger"><b>Please put unique a supply id</b></h3></center>`;
+      } else if(data == 'count') {
+        message.innerHTML = `<center><h3 class="text-danger"><b>Please follow the requirement of the fields</b></h3></center>`;
+      }
+  })
+  .catch((err)=>{
+    console.log(err);
+  });
+
  }
 
- static formSupplierSupply() {
-  supplier.innerHTML = `
-  <form id="SuppSupply" class="text-primary">
-  <br>
-  <br>
-  <center><h1><b>Add a supplier information</b></h1></center>
-  <div class="form-group">
-  <label for="exampleInputEmail1"><b>Supply ID</b></label>
-  <input type="text" class="form-control" id="supply_id" name="supply_id">
-  </div>
-  <div class="form-group">
-  <label for="exampleInputEmail1"><b>Last Name</b></label>
-  <input type="text" class="form-control" id="last" name="last">
-  </div>
-  <div class="form-group">
-  <label for="exampleInputEmail1"><b>Company Name</b></label>
-  <input type="text" class="form-control" id="company" name="company">
-  </div>
-  <div class="form-group">
-  <label for="exampleInputEmail1"><b>Contact Number</b></label>
-  <input type="text" class="form-control" id="contact" name="contact">
-  </div>
-  <input type="submit" class="form-control btn btn-outline-primary" name="submit" value="Submit">
-  </form>`;
- }
+ static suppyTransac(){
+  const supply_name = document.querySelector('#supply_name').value;
+  const supply_id = document.querySelector('#supply_id').value;
+  const quantity = document.querySelector('#quantity').value;
+  const unit_price = document.querySelector('#unit_price').value;
 
- static formSupplierTransac() {
+  let params = ['supply_name=',supply_name,'&supply_id=',supply_id,
+  '&quantity=',quantity,'&unit_price=',unit_price];
+
+  Main.postData('POST','HTTP/POST/supplier/suppliertransac.php',params)
+  .then((data)=>{
+    console.log(data);
+    if(data == 'success') {
+      message.innerHTML = '';
+      supplier.innerHTML = `<center><h1 class="text-info"><b>Transaction was finished</b></h1></center>
+        <input type="button" class="form-control btn btn-outline-secondary mt-2" value="Back to Supply ID" onclick="Supplier.formSupplierSupply()">`;
+      // console.log(xhr.responseText);
+      } else if(data == 'empty') {
+        message.innerHTML = `<center><h3 class="text-danger"><b>Please fill up all information because they are required</b></h3></center>`;
+      } 
+      else if(data == 'cannot') {
+        message.innerHTML = `<center><h3 class="text-danger"><b>Some of the field not required to put special characters or not related to field</b></h3></center>`;
+      } else if(data == 'not exist') {
+        message.innerHTML = `<center><h3 class="text-danger"><b>The supply id is invalid</b></h3></center>`;
+      } else if(data == 'count') {
+        message.innerHTML = `<center><h3 class="text-danger"><b>Please follow the requirement of the fields</b></h3></center>`;
+      }
+  })
+  .catch((err)=>{
+    console.log(err);
+  })
+ }
  
- }
-
-
-
 }
 
 // Button 

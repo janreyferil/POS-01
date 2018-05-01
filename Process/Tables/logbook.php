@@ -5,7 +5,7 @@
 trait LogBook
 {
     
-    public function TimeIn($conn,$id){
+    protected function TimeIn($conn,$id){
         $login = date('F d Y h:i A');
         $logout = 'Not Log out';
 
@@ -23,7 +23,7 @@ trait LogBook
         }
     }
 
-    public function Count($conn){
+    protected function Count($conn){
         $sql = "SELECT * FROM logbook ORDER BY log_id DESC LIMIT 1;";
         $result = $conn->query($sql);
         $tproduct =[];
@@ -34,7 +34,7 @@ trait LogBook
           return $id;
     }
 
-    public function TimeOut($conn) {
+    protected function TimeOut($conn) {
 
         $cont = $this->Count($conn);
         $logout = date('F d Y h:i A');
@@ -58,7 +58,7 @@ trait LogBook
         }
     }
 
-    public function FetchTime($conn,$s,$r,$o,$ord){
+    protected function FetchTime($conn,$s,$r,$o,$ord){
         $val = mysqli_real_escape_string($conn,$o);
         if($ord == true) {
         $sql = "SELECT * 
@@ -120,7 +120,7 @@ trait LogBook
         }
     }
 
-    public function Clock(){
+    protected function Clock(){
         $time = date('h:i:s A');
         $date = date('F d Y');
         $day = date('w');
@@ -131,7 +131,7 @@ trait LogBook
 
     }
 
-    public function DeleteTime($conn,$id) {
+    protected function DeleteTime($conn,$id) {
 
         $id = $conn->real_escape_string($id);
         $sql = "DELETE FROM logbook WHERE log_id = ?;";

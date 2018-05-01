@@ -2,7 +2,7 @@
 
 trait Announcement
 {
-    public function CreateAnnounce($conn,$t,$b) {
+    protected function CreateAnnounce($conn,$t,$b) {
 
         $title = $conn->real_escape_string(ucfirst($t));
      
@@ -31,7 +31,7 @@ trait Announcement
         }
     }   
 
-    public function FetchAnnounce($conn){        
+    protected function FetchAnnounce($conn){        
         $sql = "SELECT * FROM admin_announce ORDER BY ann_id DESC;";
         $result = $conn->query($sql);
         $data = [];
@@ -63,7 +63,7 @@ trait Announcement
         }
     }
 
-    public function EditAnnounce($conn,$id,$t,$b) {
+    protected function EditAnnounce($conn,$id,$t,$b) {
         $title = $conn->real_escape_string(ucfirst($t));
      
         if(substr($b,-1) == '.') {
@@ -91,7 +91,7 @@ trait Announcement
         }
     }
 
-    public function DeleteAnnounce($conn,$id) {
+    protected function DeleteAnnounce($conn,$id) {
         $sql = "DELETE FROM admin_announce WHERE ann_id = ?;";
         $stmt = $conn->stmt_init();
         if(!$stmt->prepare($sql)) {

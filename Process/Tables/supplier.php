@@ -1,6 +1,6 @@
 <?php 
     trait Supplier  {
-        public function SupplierPerson($conn,$i,$fn,$ln,$com,$cont) {
+        protected function SupplierPerson($conn,$i,$fn,$ln,$com,$cont) {
           $id = $conn->real_escape_string($i);
           $first = $conn->real_escape_string($fn);
           $last = $conn->real_escape_string($ln);
@@ -24,8 +24,11 @@
           } 
         }   
         
-        public function SupplierSupplyID($conn,$s_i) {
+        protected function SupplierSupplyID($conn,$s_i,$r_n) {
           $supply_id = $conn->real_escape_string(strtoupper($s_i));
+          $ref_name = $conn->real_escape_string(ucwords($r_n));
+          $s = 'not assigned';
+          $status = $conn->real_escape_string($s);
           $sqlExist = "SELECT * FROM supplier_supply WHERE supply_id = ?;";
           $stmtExist = $conn->stmt_init();
           if(!$stmtExist->prepare($sqlExist)) {
@@ -42,13 +45,13 @@
                 echo 'taken';
                 exit();
               } else {
-                $sql = "INSERT INTO supplier_supply(supply_id) VALUES(?);";
+                $sql = "INSERT INTO supplier_supply(supply_id,ref_name,status) VALUES(?,?,?);";
                 $stmt = $conn->stmt_init();
                 if(!$stmt->prepare($sql)) {
                     die($stmt->error);
                     exit();
                 } else {
-                  $stmt->bind_param('s',$supply_id);
+                  $stmt->bind_param('sss',$supply_id,$ref_name,$status);
                   if(!$stmt->execute()) {
                     die($stmt->error);
                     exit();
@@ -61,14 +64,14 @@
             }
         }
         
-        public function SupplierSupply($conn,$p_name,$u_id,$s_id,$q,$u_p) {
+        protected function SupplierSupply($conn,$p_name,$u_id,$s_id,$q,$u_p) {
           $generate_id = strtoupper(substr(str_shuffle('abcdefghijklmnopqrstuvwxyz0123456789'),0,6));
           $trans_id = $conn->real_escape_string($generate_id);
           $user_id = $conn->real_escape_string($u_id);
-          $supply_id = $conn->real_escape_string($s_id);
+          $supply_id = $conn->real_escape_string(strtoupper($s_id));
           $quantity = $conn->real_escape_string($q);
           $unit_price = $conn->real_escape_string($u_p);
-
+      
           $arrString = explode(' ',$p_name);
           $first = $arrString[0];
           $last = $arrString[1];
@@ -90,11 +93,10 @@
                 if($rowPerson = $resultPerson->fetch_assoc()){
                   $p_id = $rowPerson['person_id'];
                 }
+                $person_id = $conn->real_escape_string($p_id);
               }
             }
           }
-
-          $person_id = $conn->real_escape_string($p_id);
 
           $sqlExist = "SELECT * FROM supplier_supply WHERE supply_id = ?;";
           $stmtExist = $conn->stmt_init();
@@ -145,14 +147,16 @@
                           }
                         
                           $new_stock = $get_stock + $get_quantity;
-                          $sqlUpdate = "UPDATE supplier_supply SET stock = ? 
+                          $updated_at = date('Y-m-d H:i:s');
+                          $sqlUpdate = "UPDATE supplier_supply SET stock = ?, updated_at = ?
                           WHERE supply_id = ?;";
                           $stmtUpdate = $conn->stmt_init();
                           if(!$stmtUpdate->prepare($sqlUpdate)) {
                             die($stmtUpdate->error);
                             exit();
                           } else {
-                            $stmtUpdate->bind_param('is',$new_stock,$supply_id);
+                            
+                            $stmtUpdate->bind_param('iss',$new_stock,$updated_at,$supply_id);
                             if(!$stmtUpdate->execute()) {
                               die($stmtUpdate->error);
                               exit();
@@ -174,7 +178,29 @@
          }
         }
 
-        public function FetchSupplierName(){
-          
+        protected function FetchSupplierName($conn){
+          $sql = "SELECT * FROM supplier_person;";
+          $stmt = $conn->stmt_init();
+          if(!$stmt->prepare($sql)){
+            die($stmt->error.' - line code 181');
+            exit();
+          } else {
+            if(!$stmt->execute()){
+              die($stmt->error.' - line code 185');
+              exit();
+            } else {
+              $result = $stmt->get_result();
+              $name = [];
+              if($result->num_rows > 0) {
+                while($row = $result->fetch_assoc()){
+                 array_push($name,$row['fn'] . ' ' . $row['ln']);
+                }
+                $data = array("name"=>$name);
+                echo json_encode($data);
+              }
+            }
+          }
         }
+
+        
 }

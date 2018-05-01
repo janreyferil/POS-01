@@ -18,8 +18,13 @@ if(!isset($_POST['first'])) {
         if(!preg_match("/[A-Za-z ]+/",$first) || !preg_match("/[A-Za-z ]+/",$last) || !preg_match("/[A-Za-z0-9 ]+/",$company) || !preg_match("/[0-9]+/",$contact)) {
          echo 'cannot';
         }  else {
-        $data = new SupplierModel();
-        $data-> modelSupplierPerson($first,$last,$company,$contact);
+            if(strlen($first) > 30 || strlen($last) > 30 || strlen($company) > 50 || strlen($contact) != 11){
+                echo 'count';
+                exit();
+            } else {
+                $data = new SupplierModel();
+                $data-> modelSupplierPerson($first,$last,$company,$contact);
+            }
         }
     }
 }
