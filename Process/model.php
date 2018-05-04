@@ -186,9 +186,26 @@ class SupplierModel extends Model {
         $conn = $this->connection();
         $this->FetchSupplierName($conn);
     }
+
+    public function modelFetchSupply($search,$limit,$order){
+        $conn = $this->connection();
+        $this->FetchSupply($conn,$search,$limit,$order);
+    }
+
+    public function modelFetchSupplier($search,$limit,$order){
+        $conn = $this->connection();
+        $this->FetchSupplier($conn,$search,$limit,$order);
+    }
+
+    public function modelFetchTransaction($search,$limit,$order){
+        $conn = $this->connection();
+        $this->FetchTransaction($conn,$search,$limit,$order);
+    }
 }
 
 $new = new SupplierModel();
+//$new->modelFetchTransaction('',4,'ASC');
+//$new->modelFetchSupply('');
 //$new->modelFetchSupplierName();
 //$new->modelSupplierSupplyID('a5310','mang juan');
 //$new->modelSupplierSupply('A2310','Jose Manalo',400,2300);

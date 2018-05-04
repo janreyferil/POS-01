@@ -41,7 +41,7 @@
         } else {
             include_once 'HTTP/GET/users/fetch.php';
             include_once 'layout/usernavbar.php';
-            echo '<div class="container">';
+            echo '<div class="container-fluid">';
             include_once 'HTTP/GET/validate.php';
             echo '
             <div id="status"></div>
@@ -54,7 +54,7 @@
             <div id="mainElement"></div>
             <div id="showSupplier"></div>
             
-            <div class="modal fade" id="del">
+             <div class="modal fade" id="del">
              </div>';
             echo '<script src="JS/timer.js"></script>';
             echo '<script src="JS/user/main.js"></script>';

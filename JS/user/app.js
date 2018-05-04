@@ -252,11 +252,12 @@ class Supplier {
   const message = document.querySelector('#message');
   const create = document.querySelector('#create');
   const stock = document.querySelector('#stock');
+  const fetchs = document.querySelector('#fetchs');
 
-  mainElement.innerHTML = `<div class="card text-white border-success mb-3" style="max-width: 54rem;">
+  mainElement.innerHTML = `<div class="card text-white border-success mb-3" style="max-width: 67rem;">
   <div class="card-header">
   <i class="float-right mt-3 ml-4 fas text-warning fa-times-circle fa-2x " onclick="Main.closeAll()"></i>
-  <i class="float-right mt-3 ml-4 fas text-info fas fas fa-table faa-pulse animated-hover faa-fast fa-2x"></></i>
+  <i  id="fetchs" class="float-right mt-3 ml-4 fas text-info fas fas fa-table faa-fast fa-2x" onclick="Supplier.FetchingSupply()"></></i>
   <i id="create" class="float-right mt-3 ml-4 fas text-success fas fa-people-carry fa-2x" onclick="Supplier.RegisterPerson()"></i>
   <i id="stock" class="float-right mt-3 ml-4 fas text-primary fas fa-truck-loading fa-2x" onclick="Supplier.RegisterStock()"></i>
   <h1><b> Supplier Section</b></h1>
@@ -268,12 +269,11 @@ class Supplier {
 
   <div class="card-body">
   <div class="mb-1 mt-1" id="options"></div>
-  <br>
-  <br>
   <div id="message"></div>
   <div id="supplier"></div>
   </div>
   </div>`;
+  Supplier.FetchingSupply();
  }
 
  static RegisterPerson() {
@@ -286,23 +286,63 @@ class Supplier {
 
     stock.classList.remove('faa-bounce')
     stock.classList.remove('animated');
+
+    fetchs.classList.remove('faa-pulse');
+    fetchs.classList.remove('animated');
  }
  
  static RegisterStock() {
+   options.innerHTML = '';
    supplier.innerHTML = '';
    message.innerHTML = '';
    Supplier.formSupplierSupply();
-   options.innerHTML = `<div onclick="Supplier.formSupplierTransac()" class="float-right form-inline text-primary">
-   <i class="fas fa-hand-holding-usd ml-2 mb-1"></i><h5 class="noselect mt-1">Transaction</h5>
+   options.innerHTML =  `   <div onclick="Supplier.formSupplierSupply()" class="float-left form-inline text-primary">
+   <button class="btn btn-outline-primary mr-2"><i class="fas fa-cubes"> Add Supply</i></h5></button>
    </div>
-   <div onclick="Supplier.formSupplierSupply()" class="float-right form-inline text-primary">
-   <i class="fas fa-cubes ml-3 mr-2 mb-1"></i><h5 class="noselect mt-1">Add Supply</h5>
+  
+   <div onclick="Supplier.formSupplierTransac()" class="float-left form-inline text-primary">
+   <button class="btn btn-outline-primary mr-2"><i class="fas fa-hand-holding-usd"> Transaction</i></button>
    </div>`;
    stock.classList.add('faa-bounce')
    stock.classList.add('animated');
 
    create.classList.remove('faa-horizontal');
    create.classList.remove('animated');
+
+   fetchs.classList.remove('faa-pulse');
+   fetchs.classList.remove('animated');
+ 
+ }
+
+ static FetchingSupply(){
+  options.innerHTML = '';
+  supplier.innerHTML = '';
+  message.innerHTML = '';
+  Supplier.fetchSupply();
+  options.innerHTML = `  <div onclick="Supplier.fetchSupply()" class="float-left form-inline">
+  <button class="btn btn-outline-info mr-2"><i class="fas fas fa-boxes"> Supply</i></button>
+  </div>
+
+  <div onclick="Supplier.fetchTransac()" class="float-left form-inline">
+  <button class="btn btn-outline-info"><i class="far fa-handshake"> Transaction</i></h5></button>
+  </div>
+
+  <div onclick="Supplier.fetchSupplier()" class="float-left form-inline">
+  <button class="btn btn-outline-info ml-2"><i class="fas fa-address-book"> Supplier</i></h5></button>
+  </div>`;
+
+  fetchs.classList.add('faa-pulse');
+  fetchs.classList.add('animated');
+
+  stock.classList.remove('faa-bounce')
+  stock.classList.remove('animated');
+
+  create.classList.remove('faa-horizontal');
+  create.classList.remove('animated');
+
+  
+  const searchForm = document.querySelector('#searchForm');
+
  }
  
  static formSupplierPerson() {
@@ -343,7 +383,7 @@ class Supplier {
   supplier.innerHTML = '';
   supplier.innerHTML = `
   <form id="SuppSupply" class="text-primary">
-  <center><h1><b>Add new supplier ID</b></h1></center>
+  <center><h1><b>Add new supply ID</b></h1></center>
   <div class="form-group">
   <label for="exampleInputEmail1"><b>Supply ID</b></label>
   <input type="text" class="form-control" id="supply_id" name="supply_id" placeholder="Required an exactly 5 value">
@@ -389,7 +429,7 @@ class Supplier {
 
   <input type="submit" class="form-control btn btn-outline-primary" name="submit" value="Submit">
   </form>`;
-  const supply_name = document.querySelector('#supply_name');
+
   Main.getData('GET','HTTP/GET/supplier/suppliernamefetch.php')
   .then((data)=>{
    let list = JSON.parse(data);
@@ -425,7 +465,7 @@ class Supplier {
         <input type="button" class="form-control btn btn-outline-secondary mt-2" value="Back to the table">`;
       // console.log(xhr.responseText);
       } else if(data == 'empty') {
-        message.innerHTML = `<center><h3 class="text-danger"><b>Please fill up all information because they are required</b></h3></center>`;
+        message.innerHTML = `<center><h3 class="text-danger"><b>Please fill out all the forms</b></h3></center>`;
       } 
       else if(data == 'cannot') {
         message.innerHTML = `<center><h3 class="text-danger"><b>Please do not include any special character or not required character in specific form</b></h3></center>`;
@@ -455,7 +495,7 @@ class Supplier {
         <input type="button" class="form-control btn btn-outline-secondary mt-2" value="Back to Supply ID" onclick="Supplier.formSupplierSupply()">`;
       // console.log(xhr.responseText);
       } else if(data == 'empty') {
-        message.innerHTML = `<center><h3 class="text-danger"><b>Please fill up all information because they are required</b></h3></center>`;
+        message.innerHTML = `<center><h3 class="text-danger"><b>Please fill out all the forms</b></h3></center>`;
       } 
       else if(data == 'cannot') {
         message.innerHTML = `<center><h3 class="text-danger"><b>Please do not include any letters</b></h3></center>`;
@@ -489,7 +529,7 @@ class Supplier {
         <input type="button" class="form-control btn btn-outline-secondary mt-2" value="Back to Supply ID" onclick="Supplier.formSupplierSupply()">`;
       // console.log(xhr.responseText);
       } else if(data == 'empty') {
-        message.innerHTML = `<center><h3 class="text-danger"><b>Please fill up all information because they are required</b></h3></center>`;
+        message.innerHTML = `<center><h3 class="text-danger"><b>Please fill out all forms</b></h3></center>`;
       } 
       else if(data == 'cannot') {
         message.innerHTML = `<center><h3 class="text-danger"><b>Some of the field not required to put special characters or not related to field</b></h3></center>`;
@@ -503,8 +543,470 @@ class Supplier {
     console.log(err);
   })
  }
+
+ static fetchSupply(){
+  Supplier.DelModal();
+  supplier.innerHTML = '';
+  message.innerHTML = '';
+  supplier.innerHTML += `<h1 class="text-info mt-1"><b><center>Supply Table</center><b></h1>
+  <div class="form-inline mb-3 mt-4">
+  <form id="searchForm">
+     <div class="form-group">
+       <div class="text-light input-group-addon bg"><i id="lighten1" class="text-info fas fa-search"></i></div>
+       <input class="form-control border-info" type="text" name="search" id="search">
+
+       <div class="text-light input-group-addon bg ml-2"><i id="lighten2" class="text-info fas fa-database"></i></div>
+       <input class="form-control border-info" type="text" name="val" id="val">
+       </div>
+       </form>
+
+   <form id="orderForm">
+   <div class="form-group">
+       <div class="text-light input-group-addon ml-2"><i id="lighten3" class="text-info fas fa-sort"></i></div>
+       <select class="form-control" id="order" name="order">
+       <option value="ASC">ASCENDING ORDER</option>
+       <option value="DESC">DESCENDING ORDER</option>
+       </select>
+   </div>
+   </form>
+  </div>
+
+  <table class="table table-hover border-info">
+  <thead>
+    <tr class="table-info">
+      <th scope="col">Supply ID</th>
+      <th scope="col">Reference Name</th>
+      <th scope="col">Status</th>
+      <th scope="col">Stock</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody id="supply">
+  </tbody>
+   </table>`;
+   const search = document.querySelector('#search').value; 
+   const val = document.querySelector('#val').value;
+   const order = document.querySelector('#order').value;
+   const params = ['search=',search,'&val=',val,'&order=',order]; 
+   Main.postData('POST','HTTP/GET/supplier/supplierfetchsupply.php',params)
+   .then((data)=>{
+     let d = JSON.parse(data);
+    // console.log(d);
+     const supply = document.querySelector('#supply');
+     for(let i = 0; i < d.supply_id.length;i++){
+       supply.innerHTML += `<tr class="table-default">
+       <th scope="row" style="width: 15%">${d.supply_id[i]}</th>
+       <td style="width: 35%">${d.ref_name[i]}</td>
+       <td style="width: 20%">${d.status[i]}</td>
+       <td style="width: 15%">${d.stock[i]}</td>
+       <td style="width: 20%">
+        <i class="fas fa-edit text-danger faa-vertical animated-hover ml-2" onclick=""></i>
+        <i class="fas fa-trash-alt faa-wrench animated-hover text-warning ml-2" data-toggle="modal" data-target="#del"></i>
+        <i class="fa fa-eye faa-pulse animated-hover text-info ml-2" onclick=""></i>
+        </td>
+       </tr>`;
+     }
+   })
+   .catch((err)=>{
+     console.log(err);
+   });
+
+   const searchForm = document.querySelector('#searchForm');
+   const orderForm = document.querySelector('#orderForm');
+   searchForm.addEventListener('keyup',(x)=>{
+     x.preventDefault();
+     supply.innerHTML = '';
+    
+     const search = document.querySelector('#search').value; 
+     const val = document.querySelector('#val').value;
+     const order = document.querySelector('#order').value;
+     const params = ['search=',search,'&val=',val,'&order=',order]; 
+     Main.postData('POST','HTTP/GET/supplier/supplierfetchsupply.php',params)
+     .then((data)=>{
+       let d = JSON.parse(data);
+      // console.log(d);
+       const supply = document.querySelector('#supply');
+       for(let i = 0; i < d.supply_id.length;i++){
+         supply.innerHTML += `<tr class="table-default">
+         <th scope="row">${d.supply_id[i]}</th>
+         <td>${d.ref_name[i]}</td>
+         <td>${d.status[i]}</td>
+         <td>${d.stock[i]}</td>
+         <td>No Action</td>
+       </tr>`;
+       }
+
+       if(search == '') {
+        lighten1.classList.remove('faa-pulse');
+        lighten1.classList.remove('animated');
+      } else {
+        lighten1.classList.add('faa-pulse');
+        lighten1.classList.add('animated');
+      }
+    
+      if(val == '') {
+        lighten2.classList.remove('faa-tada');
+        lighten2.classList.remove('animated');
+      } else {
+        lighten2.classList.add('faa-tada');
+        lighten2.classList.add('animated');
+      }
+
+     })
+     .catch((err)=>{
+       console.log(err);
+     });
+   });
+
+   orderForm.addEventListener('change',(x)=>{
+    x.preventDefault();
+    supply.innerHTML = '';
+   
+    const search = document.querySelector('#search').value; 
+    const val = document.querySelector('#val').value;
+    const order = document.querySelector('#order').value;
+    const params = ['search=',search,'&val=',val,'&order=',order]; 
+    Main.postData('POST','HTTP/GET/supplier/supplierfetchsupply.php',params)
+    .then((data)=>{
+      let d = JSON.parse(data);
+     // console.log(d);
+      const supply = document.querySelector('#supply');
+      for(let i = 0; i < d.supply_id.length;i++){
+        supply.innerHTML += `<tr class="table-default">
+        <th scope="row">${d.supply_id[i]}</th>
+        <td>${d.ref_name[i]}</td>
+        <td>${d.status[i]}</td>
+        <td>${d.stock[i]}</td>
+        <td>No Action</td>
+      </tr>`;
+      }
+
+
+      lighten3.classList.add('faa-vertical');
+      lighten3.classList.add('animated');
+  
+      setTimeout(function(){
+        lighten3.classList.remove('faa-vertical');
+        lighten3.classList.remove('animated');
+    
+      },1000);
+
+    })
+    .catch((err)=>{
+      console.log(err);
+    });
+   });
+
+
+   
+ }
+ 
+ static fetchTransac(){
+  supplier.innerHTML = '';
+  message.innerHTML = '';
+  supplier.innerHTML += `<h1 class="text-info mt-1"><b><center>Transaction Table</center><b></h1>
+  <div class="form-inline mb-3 mt-4">
+  <form id="searchForm">
+     <div class="form-group">
+       <div class="text-light input-group-addon bg"><i id="lighten1" class="text-info fas fa-search"></i></div>
+       <input class="form-control border-info" type="text" name="search" id="search">
+
+       <div class="text-light input-group-addon bg ml-2"><i id="lighten2" class="text-info fas fa-database"></i></div>
+       <input class="form-control border-info" type="text" name="val" id="val">
+       </div>
+       </form>
+
+   <form id="orderForm">
+   <div class="form-group">
+       <div class="text-light input-group-addon ml-2"><i id="lighten3" class="text-info fas fa-sort"></i></div>
+       <select class="form-control" id="order" name="order">
+       <option value="DESC">DESCENDING ORDER</option>
+       <option value="ASC">ASCENDING ORDER</option>
+       </select>
+   </div>
+   </form>
+  </div>
+
+  <table class="table table-hover border-info">
+  <thead>
+    <tr class="table-info">
+      <th scope="col">Transac ID</th>
+      <th scope="col">Supplier Name</th>
+      <th scope="col">Registrar</th>
+      <th scope="col">Quantity</th>
+      <th scope="col">Unit Price</th>
+      <th scope="col">Date Issued</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody id="supply"></tbody>
+  </table>`;
+
+  const search = document.querySelector('#search').value; 
+  const val = document.querySelector('#val').value;
+  const order = document.querySelector('#order').value;
+  const params = ['search=',search,'&val=',val,'&order=',order]; 
+
+   Main.postData('POST','HTTP/GET/supplier/supplierfetchtransac.php',params)
+    .then((data)=>{
+     let d = JSON.parse(data);
+     const supply = document.querySelector('#supply');
+     for(let i = 0; i < d.supp_product_id.length;i++){
+      supply.innerHTML += `<tr class="table-default">
+      <th scope="row">${d.supp_product_id[i]}</th>
+      <td>${d.supp_person_name[i]}</td>
+      <td>${d.supp_user_name[i]}</td>
+      <td>${d.quantity[i]}</td>
+      <td>₱ ${d.unit_price[i]}</td>
+      <td>${d.created_at[i]}</td>
+      <td>No Action</td>
+    </tr>`
+    }
+   });
+   const searchForm = document.querySelector('#searchForm');
+   const orderForm = document.querySelector('#orderForm');
+
+  searchForm.addEventListener('keyup',(x)=>{
+    x.preventDefault();
+    supply.innerHTML = '';
+    console.log('response');
+    const search = document.querySelector('#search').value; 
+    const val = document.querySelector('#val').value;
+    const order = document.querySelector('#order').value;
+    const params = ['search=',search,'&val=',val,'&order=',order]; 
+    Main.postData('POST','HTTP/GET/supplier/supplierfetchtransac.php',params)
+    .then((data)=>{
+      let d = JSON.parse(data);
+      const supply = document.querySelector('#supply');
+      for(let i = 0; i < d.supp_product_id.length;i++){
+       supply.innerHTML += `<tr class="table-default">
+       <th scope="row">${d.supp_product_id[i]}</th>
+       <td>${d.supp_person_name[i]}</td>
+       <td>${d.supp_user_name[i]}</td>
+       <td>${d.quantity[i]}</td>
+       <td>₱ ${d.unit_price[i]}</td>
+       <td>${d.created_at[i]}</td>
+       <td>No Action</td>
+     </tr>`
+     }
+    })
+      .catch((err)=>{
+      console.log(err);
+       });
+  });
+
+  orderForm.addEventListener('change',(x)=>{
+   x.preventDefault();
+   supply.innerHTML = '';
+  
+   const search = document.querySelector('#search').value; 
+   const val = document.querySelector('#val').value;
+   const order = document.querySelector('#order').value;
+   const params = ['search=',search,'&val=',val,'&order=',order]; 
+   Main.postData('POST','HTTP/GET/supplier/supplierfetchtransac.php',params)
+   .then((data)=>{
+     let d = JSON.parse(data);
+     const supply = document.querySelector('#supply');
+     for(let i = 0; i < d.supp_product_id.length;i++){
+      supply.innerHTML += `<tr class="table-default">
+      <th scope="row">${d.supp_product_id[i]}</th>
+      <td>${d.supp_person_name[i]}</td>
+      <td>${d.supp_user_name[i]}</td>
+      <td>${d.quantity[i]}</td>
+      <td>₱ ${d.unit_price[i]}</td>
+      <td>${d.created_at[i]}</td>
+      <td>No Action</td>
+    </tr>`
+    }
+   })
+   .catch((err)=>{
+     console.log(err);
+   });
+  });
+ }
+
+ static fetchSupplier(){
+  supplier.innerHTML = '';
+  message.innerHTML = '';
+  supplier.innerHTML += `<h1 class="text-info mt-1"><b><center>Supplier Table</center><b></h1>
+  <div class="form-inline mb-3 mt-4">
+  <form id="searchForm">
+     <div class="form-group">
+       <div class="text-light input-group-addon bg"><i id="lighten1" class="text-info fas fa-search"></i></div>
+       <input class="form-control border-info" type="text" name="search" id="search">
+
+       <div class="text-light input-group-addon bg ml-2"><i id="lighten2" class="text-info fas fa-database"></i></div>
+       <input class="form-control border-info" type="text" name="val" id="val">
+       </div>
+       </form>
+
+   <form id="orderForm">
+   <div class="form-group">
+       <div class="text-light input-group-addon ml-2"><i id="lighten3" class="text-info fas fa-sort"></i></div>
+       <select class="form-control" id="order" name="order">
+       <option value="ASC">ASCENDING ORDER</option>
+       <option value="DESC">DESCENDING ORDER</option>
+       </select>
+   </div>
+   </form>
+  </div>
+
+  <table class="table table-hover border-info">
+  <thead>
+    <tr class="table-info">
+      <th scope="col">Name</th>
+      <th scope="col">Registrar</th>
+      <th scope="col">Company</th>
+      <th scope="col">Contact</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody id="supply">
+    </tbody>
+   </table>`;
+   const search = document.querySelector('#search').value; 
+   const val = document.querySelector('#val').value;
+   const order = document.querySelector('#order').value;
+   const params = ['search=',search,'&val=',val,'&order=',order]; 
+
+   Main.postData('POST','HTTP/GET/supplier/supplierfetch.php',params)
+    .then((data)=>{
+     let d = JSON.parse(data);
+   //  console.log(d);
+     const supply = document.querySelector('#supply');
+     for(let i = 0; i < d.name.length;i++){
+      supply.innerHTML += `<tr class="table-default">
+      <th scope="row">${d.name[i]}</th>
+      <td>${d.user_name[i]}</td>
+      <td>${d.company[i]}</td>
+      <td>${d.contact[i]}</td>
+      <td>No Action</td>
+    </tr>`
+    }
+   });
+
+   const searchForm = document.querySelector('#searchForm');
+   const orderForm = document.querySelector('#orderForm');
+
+  searchForm.addEventListener('keyup',(x)=>{
+    x.preventDefault();
+    supply.innerHTML = '';
+   
+    const search = document.querySelector('#search').value; 
+    const val = document.querySelector('#val').value;
+    const order = document.querySelector('#order').value;
+    const params = ['search=',search,'&val=',val,'&order=',order]; 
+    Main.postData('POST','HTTP/GET/supplier/supplierfetch.php',params)
+      .then((data)=>{
+      let d = JSON.parse(data);
+      // console.log(d);
+      const supply = document.querySelector('#supply');
+      for(let i = 0; i < d.name.length;i++){
+        supply.innerHTML += `<tr class="table-default">
+        <th scope="row">${d.name[i]}</th>
+        <td>${d.user_name[i]}</td>
+        <td>${d.company[i]}</td>
+        <td>${d.contact[i]}</td>
+        <td>No Action</td>
+      </tr>`
+      }
+
+      if(search == '') {
+       lighten1.classList.remove('faa-pulse');
+       lighten1.classList.remove('animated');
+     } else {
+       lighten1.classList.add('faa-pulse');
+       lighten1.classList.add('animated');
+     }
+   
+     if(val == '') {
+       lighten2.classList.remove('faa-tada');
+       lighten2.classList.remove('animated');
+     } else {
+       lighten2.classList.add('faa-tada');
+       lighten2.classList.add('animated');
+     }
+
+     })
+      .catch((err)=>{
+      console.log(err);
+       });
+  });
+
+  orderForm.addEventListener('change',(x)=>{
+   x.preventDefault();
+   supply.innerHTML = '';
+  
+   const search = document.querySelector('#search').value; 
+   const val = document.querySelector('#val').value;
+   const order = document.querySelector('#order').value;
+   const params = ['search=',search,'&val=',val,'&order=',order]; 
+   Main.postData('POST','HTTP/GET/supplier/supplierfetch.php',params)
+   .then((data)=>{
+     let d = JSON.parse(data);
+     //console.log(d);
+     const supply = document.querySelector('#supply');
+     for(let i = 0; i < d.name.length;i++){
+      supply.innerHTML += `<tr class="table-default">
+      <th scope="row">${d.name[i]}</th>
+      <td>${d.user_name[i]}</td>
+      <td>${d.company[i]}</td>
+      <td>${d.contact[i]}</td>
+      <td>No Action</td>
+    </tr>`
+    }
+
+
+     lighten3.classList.add('faa-vertical');
+     lighten3.classList.add('animated');
+ 
+     setTimeout(function(){
+       lighten3.classList.remove('faa-vertical');
+       lighten3.classList.remove('animated');
+   
+     },1000);
+
+   })
+   .catch((err)=>{
+     console.log(err);
+   });
+  });
+
+ }
+
+ static DelModal(func){
+  del.innerHTML = `
+  <div class="modal-dialog text-warning" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fas fa-exclamation-circle faa-bounce animated fa-md"></i> <b>Delete</b></h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this item?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-warning" onclick="${func}" data-dismiss="modal">Confirm</button>
+        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>`;
+ }
+
+ static DeleteItem(url,params,func_fetch){
+  Main.postData('POST',url,params)
+  .then((data)=>{
+    if(data == 'delete'){
+      func_fetch();
+    }
+  });
+ }
  
 }
+
+
 
 // Button 
 btnTodo.addEventListener('click',function(x){

@@ -148,7 +148,7 @@
                         
                           $new_stock = $get_stock + $get_quantity;
                           $updated_at = date('Y-m-d H:i:s');
-                          $sqlUpdate = "UPDATE supplier_supply SET stock = ?, updated_at = ?
+                          $sqlUpdate = "UPDATE supplier_supply SET stock = ?, supply_updated_at = ?
                           WHERE supply_id = ?;";
                           $stmtUpdate = $conn->stmt_init();
                           if(!$stmtUpdate->prepare($sqlUpdate)) {
@@ -202,5 +202,226 @@
           }
         }
 
+        protected function FetchSupply($conn,$s,$l,$o){
+          if($l === ''){
+            $l = 5;
+          }
+          if($o == 'ASC'){
+            $sql ="SELECT * FROM supplier_supply WHERE ref_name LIKE '$s%' ORDER BY ref_name ASC LIMIT $l;";     
+          } else if($o == 'DESC'){  
+            $sql ="SELECT * FROM supplier_supply WHERE ref_name LIKE '$s%' ORDER BY ref_name DESC LIMIT $l;";
+          }
+          $stmt = $conn->stmt_init();
+          if(!$stmt->prepare($sql)) {
+            die($stmt->error);
+            exit();
+          } else{
+            if(!$stmt->execute()){
+              die($stmt->error);
+              exit();
+            }else {
+              $result = $stmt->get_result();
+              $supply_id = [];
+              $ref_name = [];
+              $status = [];
+              $stock = [];
+              $created_at = [];
+              $updated_at = [];
+              if($result->num_rows > 0) {
+                while($row = $result->fetch_assoc()){
+                  array_push($supply_id,$row['supply_id']);
+                  array_push($ref_name,$row['ref_name']);
+                  array_push($status,$row['status']);
+                  array_push($stock,$row['stock']);
+                  array_push($created_at,date( "F d Y h:i A", strtotime($row['supply_created_at'])));
+                  array_push($updated_at,date( "F d Y h:i A", strtotime($row['supply_updated_at'])));
+                }
+              } else {
+                array_push($supply_id,'no search found');
+                array_push($ref_name,'no search found');
+                array_push($status,'no search found');
+                array_push($stock,'no search found');
+                array_push($created_at,'no search found');
+                array_push($updated_at,'no search found');
+              }
+              $data = array(
+                "supply_id" => $supply_id,
+                "ref_name" => $ref_name,
+                "status" => $status,
+                "stock" => $stock,
+                "created_at" => $created_at,
+                "updated_at" => $updated_at
+              );
+               echo json_encode($data);
+            }
+          }
+        }
+
+        protected function FetchSupplier($conn,$s,$l,$o){
+          if($l == ''){
+            $l = 5;
+          } 
+          if($o == 'ASC'){
+            $sql ="SELECT * FROM supplier_person
+            INNER JOIN users
+            ON supplier_person.user_id = users.id 
+            WHERE supplier_person.fn 
+            LIKE '$s%' 
+            OR supplier_person.ln 
+            LIKE '$s%'
+            ORDER BY supplier_person.fn
+            ASC
+            LIMIT
+            $l
+            ;";
+          } else if($o == 'DESC') {
+            $sql ="SELECT * FROM supplier_person
+            INNER JOIN users
+            ON supplier_person.user_id = users.id 
+            WHERE supplier_person.fn 
+            LIKE '$s%'
+            OR supplier_person.ln 
+            LIKE '$s%'
+            ORDER BY supplier_person.fn
+            DESC
+            LIMIT
+            $l
+            ;";
+          }
+        
+          $stmt = $conn->stmt_init();
+          if(!$stmt->prepare($sql)) {
+            die($stmt->error);
+            exit();
+          } else{
+            if(!$stmt->execute()){
+              die($stmt->error);
+              exit();
+            }else {
+              $result = $stmt->get_result();
+              $user_name = [];
+              $name = [];
+              $company = [];
+              $contact = [];
+              $created_at = [];
+              $updated_at = [];
+              if($result->num_rows > 0) {
+                while($row = $result->fetch_assoc()){
+                  array_push($user_name,$row['user_fn'] . ' ' . $row['user_ln']);
+                  array_push($name,$row['fn'] . ' ' . $row['ln']);
+                  array_push($company,$row['company']);
+                  array_push($contact,$row['contact']);
+                  array_push($created_at,date( "F d Y h:i A", strtotime($row['person_created_at'])));
+                  array_push($updated_at,date( "F d Y h:i A", strtotime($row['person_updated_at'])));
+                }
+              } else {
+                array_push($user_name,'no search found');
+                array_push($name,'no search found');
+                array_push($company,'no search found');
+                array_push($contact,'no search found');
+                array_push($created_at,'no search found');
+                array_push($updated_at,'no search found');
+              }
+              $data = array(
+                "user_name" => $user_name,
+                "name" => $name,
+                "company" => $company,
+                "contact" => $contact,
+                "created_at" => $created_at,
+                "updated_at" => $updated_at
+              );
+               echo json_encode($data);
+            }
+          }
+        }
+
+        protected function FetchTransaction($conn,$s,$l,$o){
+          if($l == ''){
+            $l = 5;
+          }
+          if($o == 'ASC'){
+            $sql ="SELECT * FROM supplier_transac
+            INNER JOIN supplier_person
+            ON supplier_transac.supp_person_id = supplier_person.person_id
+            INNER JOIN users
+            ON supplier_transac.supp_user_id = users.id
+            WHERE supplier_person.fn 
+            LIKE '$s%' 
+            OR supplier_person.ln 
+            LIKE '$s%'
+            ORDER BY supplier_transac.transac_created_at
+            ASC
+            LIMIT
+            $l;";
+          } else if($o == 'DESC'){
+            $sql ="SELECT * FROM supplier_transac
+            INNER JOIN supplier_person
+            ON supplier_transac.supp_person_id = supplier_person.person_id
+            INNER JOIN users
+            ON supplier_transac.supp_user_id = users.id
+            WHERE supplier_person.fn 
+            LIKE '$s%' 
+            OR supplier_person.ln 
+            LIKE '$s%'
+            ORDER BY supplier_transac.transac_created_at
+            DESC
+            LIMIT
+            $l;";
+          }
+       
+          $stmt = $conn->stmt_init();
+          if(!$stmt->prepare($sql)) {
+            die($stmt->error);
+            exit();
+          } else{
+            if(!$stmt->execute()){
+              die($stmt->error);
+              exit();
+            }else {
+              $result = $stmt->get_result();
+              $transac_id = [];
+              $supp_person_name = [];
+              $supp_user_name = [];
+              $supp_product_id = [];
+              $quantity = [];
+              $unit_price = [];
+              $created_at = [];
+              $updated_at = [];
+              if($result->num_rows > 0) {
+                while($row = $result->fetch_assoc()){
+                  array_push($transac_id,$row['transac_id']);
+                  array_push($supp_person_name,$row['fn'] . ' ' . $row['ln']);
+                  array_push($supp_user_name,$row['user_fn'] . ' ' . $row['user_ln']);
+                  array_push($supp_product_id ,$row['supp_product_id']);
+                  array_push($quantity,number_format($row['quantity'],2));
+                  array_push($unit_price,number_format($row['unit_price'],2));
+                  array_push($created_at,date( "F d Y h:i A", strtotime($row['transac_created_at'])));
+                  array_push($updated_at,date( "F d Y h:i A", strtotime($row['transac_updated_at'])));
+                }
+              } else {
+                array_push($transac_id,'no search found');
+                array_push($supp_person_name,'no search found');
+                array_push($supp_user_name,'no search found');
+                array_push($supp_product_id ,'no search found');
+                array_push($quantity,'no search found');
+                array_push($unit_price,'no search found');
+                array_push($created_at,'no search found');
+                array_push($updated_at,'no search found');
+              }
+                $data = array(
+                  "transac_id" =>   $transac_id,
+                  "supp_person_name" =>  $supp_person_name,
+                  "supp_user_name" =>  $supp_user_name,
+                  "supp_product_id" => $supp_product_id,
+                  "quantity" => $quantity,
+                  "unit_price" => $unit_price,
+                  "created_at" => $created_at,
+                  "updated_at" => $updated_at
+                );
+                 echo json_encode($data);
+              
+            }
+          }
+        }
         
 }
