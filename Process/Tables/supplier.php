@@ -1,29 +1,7 @@
 <?php 
     trait Supplier  {
-        protected function SupplierPerson($conn,$i,$fn,$ln,$com,$cont) {
-          $id = $conn->real_escape_string($i);
-          $first = $conn->real_escape_string($fn);
-          $last = $conn->real_escape_string($ln);
-          $company = $conn->real_escape_string($com);
-          $contact = $conn->real_escape_string($cont);
-
-          $sql = "INSERT INTO supplier_person(user_id,fn,ln,company,contact)
-            VALUES(?,?,?,?,?);";
-          $stmt = $conn->stmt_init();
-          if(!$stmt->prepare($sql)) {
-            die($stmt->error);
-            exit();
-          } else {
-            $stmt->bind_param('issss',$id,$first,$last,$company,$contact);
-            if(!$stmt->execute()) {
-                die($stmt->error);
-                exit();
-            } else {
-                echo 'success';
-            }
-          } 
-        }   
-        
+     
+        //Supply
         protected function SupplierSupplyID($conn,$s_i,$r_n) {
           $supply_id = $conn->real_escape_string(strtoupper($s_i));
           $ref_name = $conn->real_escape_string(ucwords($r_n));
@@ -63,7 +41,222 @@
               }
             }
         }
+
+        protected function FetchSupply($conn,$s,$l,$o){
+          if($l === ''){
+            $l = 5;
+          }
+          if($o == 'ASC'){
+            $sql ="SELECT * FROM supplier_supply WHERE ref_name LIKE '$s%' ORDER BY ref_name ASC LIMIT $l;";     
+          } else if($o == 'DESC'){  
+            $sql ="SELECT * FROM supplier_supply WHERE ref_name LIKE '$s%' ORDER BY ref_name DESC LIMIT $l;";
+          }
+          $stmt = $conn->stmt_init();
+          if(!$stmt->prepare($sql)) {
+            die($stmt->error);
+            exit();
+          } else{
+            if(!$stmt->execute()){
+              die($stmt->error);
+              exit();
+            }else {
+              $result = $stmt->get_result();
+              $id = [];
+              $supply_id = [];
+              $ref_name = [];
+              $status = [];
+              $stock = [];
+              $created_at = [];
+              $updated_at = [];
+              if($result->num_rows > 0) {
+                while($row = $result->fetch_assoc()){
+                  array_push($id,$row['id']);
+                  array_push($supply_id,$row['supply_id']);
+                  array_push($ref_name,$row['ref_name']);
+                  array_push($status,$row['status']);
+                  array_push($stock,$row['stock']);
+                  array_push($created_at,date( "F d Y h:i A", strtotime($row['supply_created_at'])));
+                  array_push($updated_at,date( "F d Y h:i A", strtotime($row['supply_updated_at'])));
+                }
+              } else {
+                array_push($id,0);
+                array_push($supply_id,'no search found');
+                array_push($ref_name,'no search found');
+                array_push($status,'no search found');
+                array_push($stock,'no search found');
+                array_push($created_at,'no search found');
+                array_push($updated_at,'no search found');
+              }
+              $data = array(
+                "id" => $id,
+                "supply_id" => $supply_id,
+                "ref_name" => $ref_name,
+                "status" => $status,
+                "stock" => $stock,
+                "created_at" => $created_at,
+                "updated_at" => $updated_at
+              );
+               echo json_encode($data);
+            }
+          }
+        }
+
+        protected function DeleteSupply($conn,$id){
+          $sqlGET = "SELECT * FROM supplier_supply WHERE id =$id;";
+          $result = $conn->query($sqlGET);
+          if($result->num_rows > 0){
+            if($row = $result->fetch_assoc()){
+              $stock = $row['stock'];
+            }
+            if($stock != 0){
+              echo 'stock';
+              exit();
+            }
+          }
+          $sql = "DELETE FROM supplier_supply WHERE id =? AND stock = 0;";
+          $stmt = $conn->stmt_init();
+          if(!$stmt->prepare($sql)) {
+              die($stmt->error);
+              exit();
+          } else {
+              $stmt->bind_param('i',$id);
+              if(!$stmt->execute()) {
+                  die($stmt->error);
+                  exit();
+              } else {
+                  echo 'delete';
+                  exit();
+              }
+          }    
+        }
+
+        protected function ShowSupply($conn,$id){
+          $sql = "SELECT * FROM supplier_supply INNER JOIN
+          supplier_transac ON
+          supplier_supply.supply_id = supplier_transac.supp_product_id
+          WHERE  supplier_supply.id = $id;";
+          $result = $conn->query($sql);
+          if($result->num_rows > 0){
+            if($row = $result->fetch_assoc()){
+              $data = array("supply_id"=>$row['supply_id'],
+              "ref_name"=>$row['ref_name'],
+              "status"=>$row['status'],
+              "stock"=>$row['stock'],
+              "transaction"=>count($row['supp_product_id']),
+              "created_at"=>date( "F d Y h:i A", strtotime($row['supply_created_at'])),
+              "updated_at"=>date( "F d Y h:i A", strtotime($row['supply_updated_at']))
+              );
+              echo json_encode($data);
+              exit();
+            }
+          }
+        }
+
+        //Supplier
+        protected function FetchSupplier($conn,$s,$l,$o){
+          if($l == ''){
+            $l = 5;
+          } 
+          if($o == 'ASC'){
+            $sql ="SELECT * FROM supplier_person
+            INNER JOIN users
+            ON supplier_person.user_id = users.id 
+            WHERE supplier_person.fn 
+            LIKE '$s%' 
+            OR supplier_person.ln 
+            LIKE '$s%'
+            ORDER BY supplier_person.fn
+            ASC
+            LIMIT
+            $l
+            ;";
+          } else if($o == 'DESC') {
+            $sql ="SELECT * FROM supplier_person
+            INNER JOIN users
+            ON supplier_person.user_id = users.id 
+            WHERE supplier_person.fn 
+            LIKE '$s%'
+            OR supplier_person.ln 
+            LIKE '$s%'
+            ORDER BY supplier_person.fn
+            DESC
+            LIMIT
+            $l
+            ;";
+          }
         
+          $stmt = $conn->stmt_init();
+          if(!$stmt->prepare($sql)) {
+            die($stmt->error);
+            exit();
+          } else{
+            if(!$stmt->execute()){
+              die($stmt->error);
+              exit();
+            }else {
+              $result = $stmt->get_result();
+              $user_name = [];
+              $name = [];
+              $company = [];
+              $contact = [];
+              $created_at = [];
+              $updated_at = [];
+              if($result->num_rows > 0) {
+                while($row = $result->fetch_assoc()){
+                  
+                  array_push($user_name,$row['user_fn'] . ' ' . $row['user_ln']);
+                  array_push($name,$row['fn'] . ' ' . $row['ln']);
+                  array_push($company,$row['company']);
+                  array_push($contact,$row['contact']);
+                  array_push($created_at,date( "F d Y h:i A", strtotime($row['person_created_at'])));
+                  array_push($updated_at,date( "F d Y h:i A", strtotime($row['person_updated_at'])));
+                }
+              } else {
+                array_push($user_name,'no search found');
+                array_push($name,'no search found');
+                array_push($company,'no search found');
+                array_push($contact,'no search found');
+                array_push($created_at,'no search found');
+                array_push($updated_at,'no search found');
+              }
+              $data = array(
+                "user_name" => $user_name,
+                "name" => $name,
+                "company" => $company,
+                "contact" => $contact,
+                "created_at" => $created_at,
+                "updated_at" => $updated_at
+              );
+               echo json_encode($data);
+            }
+          }
+        }
+
+        protected function SupplierPerson($conn,$i,$fn,$ln,$com,$cont) {
+          $id = $conn->real_escape_string($i);
+          $first = $conn->real_escape_string($fn);
+          $last = $conn->real_escape_string($ln);
+          $company = $conn->real_escape_string($com);
+          $contact = $conn->real_escape_string($cont);
+
+          $sql = "INSERT INTO supplier_person(user_id,fn,ln,company,contact)
+            VALUES(?,?,?,?,?);";
+          $stmt = $conn->stmt_init();
+          if(!$stmt->prepare($sql)) {
+            die($stmt->error);
+            exit();
+          } else {
+            $stmt->bind_param('issss',$id,$first,$last,$company,$contact);
+            if(!$stmt->execute()) {
+                die($stmt->error);
+                exit();
+            } else {
+                echo 'success';
+            }
+          } 
+        }   
+
+        //Trasnsaction
         protected function SupplierSupply($conn,$p_name,$u_id,$s_id,$q,$u_p) {
           $generate_id = strtoupper(substr(str_shuffle('abcdefghijklmnopqrstuvwxyz0123456789'),0,6));
           $trans_id = $conn->real_escape_string($generate_id);
@@ -178,163 +371,6 @@
          }
         }
 
-        protected function FetchSupplierName($conn){
-          $sql = "SELECT * FROM supplier_person;";
-          $stmt = $conn->stmt_init();
-          if(!$stmt->prepare($sql)){
-            die($stmt->error.' - line code 181');
-            exit();
-          } else {
-            if(!$stmt->execute()){
-              die($stmt->error.' - line code 185');
-              exit();
-            } else {
-              $result = $stmt->get_result();
-              $name = [];
-              if($result->num_rows > 0) {
-                while($row = $result->fetch_assoc()){
-                 array_push($name,$row['fn'] . ' ' . $row['ln']);
-                }
-                $data = array("name"=>$name);
-                echo json_encode($data);
-              }
-            }
-          }
-        }
-
-        protected function FetchSupply($conn,$s,$l,$o){
-          if($l === ''){
-            $l = 5;
-          }
-          if($o == 'ASC'){
-            $sql ="SELECT * FROM supplier_supply WHERE ref_name LIKE '$s%' ORDER BY ref_name ASC LIMIT $l;";     
-          } else if($o == 'DESC'){  
-            $sql ="SELECT * FROM supplier_supply WHERE ref_name LIKE '$s%' ORDER BY ref_name DESC LIMIT $l;";
-          }
-          $stmt = $conn->stmt_init();
-          if(!$stmt->prepare($sql)) {
-            die($stmt->error);
-            exit();
-          } else{
-            if(!$stmt->execute()){
-              die($stmt->error);
-              exit();
-            }else {
-              $result = $stmt->get_result();
-              $supply_id = [];
-              $ref_name = [];
-              $status = [];
-              $stock = [];
-              $created_at = [];
-              $updated_at = [];
-              if($result->num_rows > 0) {
-                while($row = $result->fetch_assoc()){
-                  array_push($supply_id,$row['supply_id']);
-                  array_push($ref_name,$row['ref_name']);
-                  array_push($status,$row['status']);
-                  array_push($stock,$row['stock']);
-                  array_push($created_at,date( "F d Y h:i A", strtotime($row['supply_created_at'])));
-                  array_push($updated_at,date( "F d Y h:i A", strtotime($row['supply_updated_at'])));
-                }
-              } else {
-                array_push($supply_id,'no search found');
-                array_push($ref_name,'no search found');
-                array_push($status,'no search found');
-                array_push($stock,'no search found');
-                array_push($created_at,'no search found');
-                array_push($updated_at,'no search found');
-              }
-              $data = array(
-                "supply_id" => $supply_id,
-                "ref_name" => $ref_name,
-                "status" => $status,
-                "stock" => $stock,
-                "created_at" => $created_at,
-                "updated_at" => $updated_at
-              );
-               echo json_encode($data);
-            }
-          }
-        }
-
-        protected function FetchSupplier($conn,$s,$l,$o){
-          if($l == ''){
-            $l = 5;
-          } 
-          if($o == 'ASC'){
-            $sql ="SELECT * FROM supplier_person
-            INNER JOIN users
-            ON supplier_person.user_id = users.id 
-            WHERE supplier_person.fn 
-            LIKE '$s%' 
-            OR supplier_person.ln 
-            LIKE '$s%'
-            ORDER BY supplier_person.fn
-            ASC
-            LIMIT
-            $l
-            ;";
-          } else if($o == 'DESC') {
-            $sql ="SELECT * FROM supplier_person
-            INNER JOIN users
-            ON supplier_person.user_id = users.id 
-            WHERE supplier_person.fn 
-            LIKE '$s%'
-            OR supplier_person.ln 
-            LIKE '$s%'
-            ORDER BY supplier_person.fn
-            DESC
-            LIMIT
-            $l
-            ;";
-          }
-        
-          $stmt = $conn->stmt_init();
-          if(!$stmt->prepare($sql)) {
-            die($stmt->error);
-            exit();
-          } else{
-            if(!$stmt->execute()){
-              die($stmt->error);
-              exit();
-            }else {
-              $result = $stmt->get_result();
-              $user_name = [];
-              $name = [];
-              $company = [];
-              $contact = [];
-              $created_at = [];
-              $updated_at = [];
-              if($result->num_rows > 0) {
-                while($row = $result->fetch_assoc()){
-                  array_push($user_name,$row['user_fn'] . ' ' . $row['user_ln']);
-                  array_push($name,$row['fn'] . ' ' . $row['ln']);
-                  array_push($company,$row['company']);
-                  array_push($contact,$row['contact']);
-                  array_push($created_at,date( "F d Y h:i A", strtotime($row['person_created_at'])));
-                  array_push($updated_at,date( "F d Y h:i A", strtotime($row['person_updated_at'])));
-                }
-              } else {
-                array_push($user_name,'no search found');
-                array_push($name,'no search found');
-                array_push($company,'no search found');
-                array_push($contact,'no search found');
-                array_push($created_at,'no search found');
-                array_push($updated_at,'no search found');
-              }
-              $data = array(
-                "user_name" => $user_name,
-                "name" => $name,
-                "company" => $company,
-                "contact" => $contact,
-                "created_at" => $created_at,
-                "updated_at" => $updated_at
-              );
-               echo json_encode($data);
-            }
-          }
-        }
-
         protected function FetchTransaction($conn,$s,$l,$o){
           if($l == ''){
             $l = 5;
@@ -422,6 +458,29 @@
               
             }
           }
+        }    
+
+        protected function FetchSupplierName($conn){
+          $sql = "SELECT * FROM supplier_person;";
+          $stmt = $conn->stmt_init();
+          if(!$stmt->prepare($sql)){
+            die($stmt->error.' - line code 181');
+            exit();
+          } else {
+            if(!$stmt->execute()){
+              die($stmt->error.' - line code 185');
+              exit();
+            } else {
+              $result = $stmt->get_result();
+              $name = [];
+              if($result->num_rows > 0) {
+                while($row = $result->fetch_assoc()){
+                 array_push($name,$row['fn'] . ' ' . $row['ln']);
+                }
+                $data = array("name"=>$name);
+                echo json_encode($data);
+              }
+            }
+          }
         }
-        
-}
+    }

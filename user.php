@@ -41,7 +41,7 @@
         } else {
             include_once 'HTTP/GET/users/fetch.php';
             include_once 'layout/usernavbar.php';
-            echo '<div class="container-fluid">';
+            echo '<div class="container">';
             include_once 'HTTP/GET/validate.php';
             echo '
             <div id="status"></div>

@@ -9,6 +9,7 @@ class Model extends Database {
     use Announcement;
     use Todo;
     use Supplier;
+ 
 
     public function __construct() {
         date_default_timezone_set("Asia/Manila");
@@ -201,9 +202,21 @@ class SupplierModel extends Model {
         $conn = $this->connection();
         $this->FetchTransaction($conn,$search,$limit,$order);
     }
+
+    public function modelDeleteSupply($id){
+        $conn = $this->connection();
+        $this->DeleteSupply($conn,$id);
+    }
+
+    public function modelShowSupply($id){
+        $conn = $this->connection();
+        $this->ShowSupply($conn,$id);
+    }
 }
 
 $new = new SupplierModel();
+//$new->modelShowSupply('28');
+//$new->modelDeleteSupply(18);
 //$new->modelFetchTransaction('',4,'ASC');
 //$new->modelFetchSupply('');
 //$new->modelFetchSupplierName();
