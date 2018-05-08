@@ -1,1059 +1,754 @@
-
-// Main Element
-const mainElement = document.querySelector('#mainElement');
-
-// Todo
-
-let bolTodo = true;
-const btnTodo = document.querySelector('#btnTodo');
-
-// Supplier
-let bolSupplier = true;
-const btnSupplier = document.querySelector('#btnSupplier');
-
-class Main {
-   static getData(method,url){
-    return new Promise((resolve,reject) => {
-      let xhr = new XMLHttpRequest();
-      xhr.open(method,url);
-      xhr.onload = function(){
-        if(xhr.status == 200) {
-          resolve(xhr.responseText);
-        } else {
-          reject({
-            status: xhr.status,
-            statusText: xhr.status
-          });
+<?php 
+    trait Supplier  {
+     
+        //Supply
+        protected function SupplierSupplyID($conn,$s_i,$r_n) {
+          $supply_id = $conn->real_escape_string(strtoupper($s_i));
+          $ref_name = $conn->real_escape_string(ucwords($r_n));
+          $s = 'not assigned';
+          $status = $conn->real_escape_string($s);
+          $sqlExist = "SELECT * FROM supplier_supply WHERE supply_id = ?;";
+          $stmtExist = $conn->stmt_init();
+          if(!$stmtExist->prepare($sqlExist)) {
+            die($stmtExist->error);
+            exit();
+          } else {
+            $stmtExist->bind_param('s',$supply_id);
+            if(!$stmtExist->execute()) {
+              die($stmtExist->error);
+              exit();
+            } else {
+              $result = $stmtExist->get_result();
+              if($result->num_rows >= 1) {
+                echo 'taken';
+                exit();
+              } else {
+                $sql = "INSERT INTO supplier_supply(supply_id,ref_name,status) VALUES(?,?,?);";
+                $stmt = $conn->stmt_init();
+                if(!$stmt->prepare($sql)) {
+                    die($stmt->error);
+                    exit();
+                } else {
+                  $stmt->bind_param('sss',$supply_id,$ref_name,$status);
+                  if(!$stmt->execute()) {
+                    die($stmt->error);
+                    exit();
+                  } else {
+                    echo 'success';
+                  }
+                }
+              }
+              }
+            }
         }
-      }
-      xhr.onerror = function(){
-        reject({
-          status: xhr.status,
-          statusText: xhr.status
-        });
-      }
-      xhr.send();
-    });
 
-  }
-   static postData(method,url,params){
-    return new Promise((resolve,reject) => {
-      let param = '';
-      for(let i = 0; i < params.length; i++) {
-          param += params[i];
+        protected function FetchSupply($conn,$s,$l,$o){
+          if($l === ''){
+            $l = 5;
+          }
+          if($o == 'ASC'){
+            $sql ="SELECT * FROM supplier_supply WHERE ref_name LIKE '$s%' ORDER BY ref_name ASC LIMIT $l;";     
+          } else if($o == 'DESC'){  
+            $sql ="SELECT * FROM supplier_supply WHERE ref_name LIKE '$s%' ORDER BY ref_name DESC LIMIT $l;";
+          }
+          $stmt = $conn->stmt_init();
+          if(!$stmt->prepare($sql)) {
+            die($stmt->error);
+            exit();
+          } else{
+            if(!$stmt->execute()){
+              die($stmt->error);
+              exit();
+            }else {
+              $result = $stmt->get_result();
+              $id = [];
+              $supply_id = [];
+              $ref_name = [];
+              $status = [];
+              $stock = [];
+              $created_at = [];
+              $updated_at = [];
+              if($result->num_rows > 0) {
+                while($row = $result->fetch_assoc()){
+                  array_push($id,$row['id']);
+                  array_push($supply_id,$row['supply_id']);
+                  array_push($ref_name,$row['ref_name']);
+                  array_push($status,$row['status']);
+                  array_push($stock,$row['stock']);
+                  array_push($created_at,date( "F d Y h:i A", strtotime($row['supply_created_at'])));
+                  array_push($updated_at,date( "F d Y h:i A", strtotime($row['supply_updated_at'])));
+                }
+              } else {
+                array_push($id,0);
+                array_push($supply_id,'no search found');
+                array_push($ref_name,'no search found');
+                array_push($status,'no search found');
+                array_push($stock,'no search found');
+                array_push($created_at,'no search found');
+                array_push($updated_at,'no search found');
+              }
+              $data = array(
+                "id" => $id,
+                "supply_id" => $supply_id,
+                "ref_name" => $ref_name,
+                "status" => $status,
+                "stock" => $stock,
+                "created_at" => $created_at,
+                "updated_at" => $updated_at
+              );
+               echo json_encode($data);
+            }
+          }
         }
-      let xhr = new XMLHttpRequest();
-      xhr.open(method,url,true);
-      xhr.setRequestHeader('Content-type','application/x-www-form-urlencoded');
-      xhr.onload = function(){
-        if(xhr.status == 200) {
-          resolve(xhr.responseText);
-        } else {
-          reject({
-            status: xhr.status,
-            statusText: xhr.status
-          });
+
+        protected function DeleteSupply($conn,$id){
+          $sqlGET = "SELECT * FROM supplier_supply WHERE id =$id;";
+          $result = $conn->query($sqlGET);
+          if($result->num_rows > 0){
+            if($row = $result->fetch_assoc()){
+              $stock = $row['stock'];
+            }
+            if($stock != 0){
+              echo 'stock';
+              exit();
+            }
+          }
+          $sql = "DELETE FROM supplier_supply WHERE id =? AND stock = 0;";
+          $stmt = $conn->stmt_init();
+          if(!$stmt->prepare($sql)) {
+              die($stmt->error);
+              exit();
+          } else {
+              $stmt->bind_param('i',$id);
+              if(!$stmt->execute()) {
+                  die($stmt->error);
+                  exit();
+              } else {
+                  echo 'delete';
+                  exit();
+              }
+          }    
         }
-      }
-      xhr.onerror = function(){
-        reject({
-          status: xhr.status,
-          statusText: xhr.status
-        });
-      }
-      xhr.send(param);
-    });
 
-  }
-  static closeAll() {
-    mainElement.innerHTML = '';
-    bolTodo = true;
-    bolSupplier = true;
-  }
-}
-
-class Todo {
-  static MainTodo(){
-    
-    const create = document.querySelector('#create');
-    const show = document.querySelector('#show');
-
-    const todo = document.querySelector('#todo');
-    const del = document.querySelector('#del');
-
-    mainElement.innerHTML = `<div class="card text-white border-success mb-3" style="max-width: 54rem;">
-    <div class="card-header">
-    <i class="float-right mt-3 ml-4 fas text-warning fa-times-circle fa-2x " onclick="Main.closeAll()"></i>
-    <i id="create" class="float-right text-primary ml-4 mt-3 fa fa-pencil-alt fa-2x " onclick="Todo.Create()"></i>
-    <i id="show" class="float-right text-info mt-3 fas fa-eye faa-fast fa-2x" onclick="Todo.Show()"></i>
-    <h1><b> To-Do List</b></h1>
-    <small class="float-right text-warning mr-1 ml-3"><b>Close</b></small>
-    <small class="float-right text-primary mr-4 ml-3"><b>Write</b></small>
-    <small class="float-right text-info mr-3"><b>Show</b></small>
-    </div>
-    
-    <div class="card-body">
-    <div id="todo"></div>
-    </div>
-    </div>`;
-  
-    Todo.Show();
-  }
-
-  static fetchTodo() {
-    Todo.DelModal();
-    Main.getData('GET','HTTP/GET/todo/todofetch.php')
-    .then((data)=> {
-      let d = JSON.parse(data);
-      console.log(d);
-      let output = ``;
-      if(d.id == 0) {
-        output += `<center><h1>Create new todo</h1></center>`;
-
-      } 
-      for(let i = 0; i < d.id.length; i++) {
-            output += `
-            <div class="card text-white bg-dark text-light mb-3" style="max-width: 54rem;">
-            <div class="card-body">
-            <i class="fas fa-trash-alt faa-wrench animated-hover text-warning float-right mr-4" onclick = "Todo.delGet(${d.id[i]})" data-toggle="modal" data-target="#del"></i>
-              <small><b>Written On ${d.created_at[i]}</b></small>
-              <br>
-              <br>
-              <h5>${d.body[i]}</h5>
-              </div>
-              </div>`;
+        protected function ShowSupply($conn,$id){
+          $sql = "SELECT * FROM supplier_supply WHERE id = $id;";
+          $result = $conn->query($sql);
+          if($result->num_rows > 0){
+            if($row = $result->fetch_assoc()){
+              $data = array("supply_id"=>$row['supply_id'],
+              "ref_name"=>$row['ref_name'],
+              "status"=>$row['status'],
+              "stock"=>$row['stock'],
+              "created_at"=>date( "F d Y h:i A", strtotime($row['supply_created_at'])),
+              "updated_at"=>date( "F d Y h:i A", strtotime($row['supply_updated_at']))
+              );
+              echo json_encode($data);
+              exit();
+            }
+          }
         }
-        todo.innerHTML = output;
-      }
-    )
-    .catch((err)=>{
-        console.log(err);
-    });
-  }
 
-  static createTodo() {
-    let b = document.querySelector('#body').value;
-    let params = ['body=',b];
-    Main.postData('POST','HTTP/POST/todo/createtodo.php',params)
-    .then((data)=>{
-      if(data == 'success') {
-        todo.innerHTML = `<center><h1><b>Todo was added</b></h1></center>
-          <input type="button" class="form-control btn btn-outline-secondary mt-2" onclick="Todo.Show()" value="Back to the todo">`;
-        // console.log(xhr.responseText);
-        } else if(data == 'empty') {
-          todo.innerHTML = `<center><h1><b>Please compose a todo</b></h1></center>
-          <input type="button" class="form-control btn btn-outline-secondary mt-2" onclick="Todo.formTodo()" value="Back to the create form">`;
-        } 
-    })
-    .catch((err)=>{
-      console.log(err);
-    });
-  }
+        protected function UpdatedSupply($conn,$id,$s_id,$r_n){
+          $supply_id = $conn->real_escape_string(strtoupper($s_id));
+          $ref_name= $conn->real_escape_string(ucwords($r_n));
+          $updated_at = date('Y-m-d H:i:s');
 
-  static formTodo(){
-    todo.innerHTML = `
-    <form id="cTodo" class="text-light">
-    <center><h1><b>Add Todo</b></h1></center>
-    <div class="form-group">
-    <label for="exampleInputEmail1"><b>Body</b></label>
-    <textarea class="form-control" id="body" name="body"></textarea>
-    </div>
-    <input type="submit" class="form-control btn btn-outline-light" name="submit" value="Add">
-    </form>`;
+          $sqlVer = "SELECT * FROM supplier_supply WHERE id=$id;";
+          $result = $conn->query($sqlVer);
+          if($result->num_rows > 0){
+            if($row = $result->fetch_assoc()){
+              $stock = $row['stock'];
+              $get_supply = $row['supply_id'];
+            }
+            if($stock != 0){
+              if($get_supply != $supply_id) {
+                echo 'stock';
+                exit();
+              } else {
+                $sql = "UPDATE supplier_supply SET supply_id = ?, ref_name = ?, supply_updated_at = ? WHERE id = ?;";
+                $stmt = $conn->stmt_init();
+                if(!$stmt->prepare($sql)){
+                  die($stmt->error);
+                  exit();
+                } else {
+                  $stmt->bind_param('sssi',$get_supply,$ref_name,$updated_at,$id);
+                  if(!$stmt->execute()){
+                    die($stmt->error);
+                    exit();
+                  }else {
+                    echo 'success';
+                  }
+              }
+            }
+            } else {
+          $sql = "UPDATE supplier_supply SET supply_id = ?, ref_name = ?, supply_updated_at = ? WHERE id = ?;";
+          $stmt = $conn->stmt_init();
+          if(!$stmt->prepare($sql)){
+            die($stmt->error);
+            exit();
+          } else {
+            $stmt->bind_param('sssi',$supply_id,$ref_name,$updated_at,$id);
+            if(!$stmt->execute()){
+              die($stmt->error);
+              exit();
+            }else {
+              echo 'success';
+            }
+          }
+            }
+          }
 
-    
-    let cTodo = document.querySelector('#cTodo');
-  
-    cTodo.addEventListener('submit',function(x){
-      x.preventDefault();
-      Todo.createTodo();
-    });
-  }
-
-  static DeleteTodo() {
-    let id = JSON.parse(sessionStorage.getItem('del_id'));
-    let xhr = new XMLHttpRequest();
-    let param = "hid="+id.del;
-    xhr.open('POST','HTTP/DELETE/todo/deletetodo.php',true);
-    xhr.setRequestHeader('Content-type','application/x-www-form-urlencoded');
-    xhr.onreadystatechange = function(){
-      if(xhr.readyState == 4 && xhr.status == 200) {
-        console.log(xhr.responseText);
-        if(xhr.responseText == 'delete') {
-          Todo.fetchTodo();
         }
+
+        //Supplier
+        protected function FetchSupplier($conn,$s,$l,$o){
+          if($l == ''){
+            $l = 5;
+          } 
+          if($o == 'ASC'){
+            $sql ="SELECT * FROM supplier_person
+            INNER JOIN users
+            ON supplier_person.user_id = users.id 
+            WHERE supplier_person.fn 
+            LIKE '$s%' 
+            OR supplier_person.ln 
+            LIKE '$s%'
+            ORDER BY supplier_person.fn
+            ASC
+            LIMIT
+            $l
+            ;";
+          } else if($o == 'DESC') {
+            $sql ="SELECT * FROM supplier_person
+            INNER JOIN users
+            ON supplier_person.user_id = users.id 
+            WHERE supplier_person.fn 
+            LIKE '$s%'
+            OR supplier_person.ln 
+            LIKE '$s%'
+            ORDER BY supplier_person.fn
+            DESC
+            LIMIT
+            $l
+            ;";
+          }
+        
+          $stmt = $conn->stmt_init();
+          if(!$stmt->prepare($sql)) {
+            die($stmt->error);
+            exit();
+          } else{
+            if(!$stmt->execute()){
+              die($stmt->error);
+              exit();
+            }else {
+              $result = $stmt->get_result();
+              $id= [];
+              $user_name = [];
+              $name = [];
+              $company = [];
+              $contact = [];
+              $created_at = [];
+              $updated_at = [];
+              if($result->num_rows > 0) {
+                while($row = $result->fetch_assoc()){
+                  array_push($id,$row['person_id']);
+                  array_push($user_name,$row['user_fn'] . ' ' . $row['user_ln']);
+                  array_push($name,$row['fn'] . ' ' . $row['ln']);
+                  array_push($company,$row['company']);
+                  array_push($contact,$row['contact']);
+                  array_push($created_at,date( "F d Y h:i A", strtotime($row['person_created_at'])));
+                  array_push($updated_at,date( "F d Y h:i A", strtotime($row['person_updated_at'])));
+                }
+              } else {
+                array_push($id,0);
+                array_push($user_name,'no search found');
+                array_push($name,'no search found');
+                array_push($company,'no search found');
+                array_push($contact,'no search found');
+                array_push($created_at,'no search found');
+                array_push($updated_at,'no search found');
+              }
+              $data = array(
+                "id" => $id,
+                "user_name" => $user_name,
+                "name" => $name,
+                "company" => $company,
+                "contact" => $contact,
+                "created_at" => $created_at,
+                "updated_at" => $updated_at
+              );
+               echo json_encode($data);
+            }
+          }
         }
-    }
-    xhr.onerror = function(){
-      return xhr.statusText;
-    }
-      xhr.send(param);
-  }
 
-  static delGet(id) {
-      let d = {
-        del:id
-      }
-      if(sessionStorage.getItem('del_id') == null) {
-        sessionStorage.setItem('del_id',JSON.stringify(d));
-      } else {
-        let data = JSON.parse(sessionStorage.getItem('del_id'))
-      //  console.log(data.del);
-        data.del = id;
-        sessionStorage.setItem('del_id',JSON.stringify(data));
-      }
-  }
+        protected function SupplierPerson($conn,$i,$fn,$ln,$com,$cont) {
+          $id = $conn->real_escape_string($i);
+          $first = $conn->real_escape_string($fn);
+          $last = $conn->real_escape_string($ln);
+          $company = $conn->real_escape_string($com);
+          $contact = $conn->real_escape_string($cont);
 
-  static DelModal(){
-    del.innerHTML = `
-    <div class="modal-dialog text-warning" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 class="modal-title"><i class="fas fa-exclamation-circle faa-bounce animated fa-md"></i> <b>Delete</b></h3>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <p>Are you sure you want to delete this item?</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline-warning" onclick="Todo.DeleteTodo()" data-dismiss="modal">Confirm</button>
-          <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
-        </div>
-      </div>
-    </div>`;
-  }
+          $sql = "INSERT INTO supplier_person(user_id,fn,ln,company,contact)
+            VALUES(?,?,?,?,?);";
+          $stmt = $conn->stmt_init();
+          if(!$stmt->prepare($sql)) {
+            die($stmt->error);
+            exit();
+          } else {
+            $stmt->bind_param('issss',$id,$first,$last,$company,$contact);
+            if(!$stmt->execute()) {
+                die($stmt->error);
+                exit();
+            } else {
+                echo 'success';
+            }
+          } 
+        }   
 
-  static Create(){
-        Todo.formTodo();
-        create.classList.add('faa-tada');
-        create.classList.add('animated');
-        show.classList.remove('faa-pulse');
-        show.classList.remove('animated');
-  }
-  
-  static Show(){
-      Todo.fetchTodo();
-      show.classList.add('faa-pulse');
-      show.classList.add('animated');
-      create.classList.remove('faa-tada');
-      create.classList.remove('animated');
-  }
+        protected function DeleteSupplier($conn,$id){
+          $sql = "DELETE FROM supplier_person WHERE person_id = ?;";
+          $stmt = $conn->stmt_init();
+          if(!$stmt->prepare($sql)) {
+              die($stmt->error);
+              exit();
+          } else {
+              $stmt->bind_param('i',$id);
+              if(!$stmt->execute()) {
+                  die($stmt->error);
+                  exit();
+              } else {
+                  echo 'delete';
+                  exit();
+              }
+          }    
+        }
 
-}
+        protected function ShowSupplier($conn,$id){
+          $sql ="SELECT * FROM supplier_person
+          INNER JOIN users
+          ON supplier_person.user_id = users.id 
+          WHERE supplier_person.person_id = $id;";
+          $result = $conn->query($sql);
+          if($result->num_rows > 0){
+            if($row = $result->fetch_assoc()){
+              $data = array("person_id"=>$row['person_id'],
+              "user_name"=>$row['user_fn'] . ' ' . $row['user_ln'],
+              "first"=>$row['fn'],
+              "last"=> $row['ln'],
+              "company"=>$row['company'],
+              "contact"=>$row['contact'],
+              "created_at"=>date( "F d Y h:i A", strtotime($row['person_created_at'])),
+              "updated_at"=>date( "F d Y h:i A", strtotime($row['person_updated_at']))
+              );
+              echo json_encode($data);
+              exit();
+            }
+          }
+        }
 
-class Supplier {
-
- static MainSupplier() {
-  const supplier = document.querySelector('#supplier');
-  const options = document.querySelector('#options');
-  const message = document.querySelector('#message');
-  const create = document.querySelector('#create');
-  const stock = document.querySelector('#stock');
-  const fetchs = document.querySelector('#fetchs');
-
-  mainElement.innerHTML = `<div class="card text-white border-success mb-3" style="max-width: 67rem;">
-  <div class="card-header">
-  <i class="float-right mt-3 ml-4 fas text-warning fa-times-circle fa-2x " onclick="Main.closeAll()"></i>
-  <i  id="fetchs" class="float-right mt-3 ml-4 fas text-info fas fas fa-table faa-fast fa-2x" onclick="Supplier.FetchingSupply()"></></i>
-  <i id="create" class="float-right mt-3 ml-4 fas text-success fas fa-people-carry fa-2x" onclick="Supplier.RegisterPerson()"></i>
-  <i id="stock" class="float-right mt-3 ml-4 fas text-primary fas fa-truck-loading fa-2x" onclick="Supplier.RegisterStock()"></i>
-  <h1><b> Supplier Section</b></h1>
-  <small class="float-right text-warning mr-2 ml-4"><b>Close</b></small>
-  <small class="float-right text-info mr-2 ml-2"><b>Table</b></small>
-  <small class="float-right text-success mr-3 ml-3"><b>Supplier</b></small>
-  <small class="float-right text-primary mr-3"><b>Stock</b></small>
-  </div>
-
-  <div class="card-body">
-  <div class="mb-1 mt-1" id="options"></div>
-  <div id="message"></div>
-  <div id="supplier"></div>
-  </div>
-  </div>`;
-  Supplier.FetchingSupply();
- }
-
- static RegisterPerson() {
-    supplier.innerHTML = '';
-    options.innerHTML = '';
-    message.innerHTML = '';
-    Supplier.formSupplierPerson();
-    create.classList.add('faa-horizontal');
-    create.classList.add('animated');
-
-    stock.classList.remove('faa-bounce')
-    stock.classList.remove('animated');
-
-    fetchs.classList.remove('faa-pulse');
-    fetchs.classList.remove('animated');
- }
- 
- static RegisterStock() {
-   options.innerHTML = '';
-   supplier.innerHTML = '';
-   message.innerHTML = '';
-   Supplier.formSupplierSupply();
-   options.innerHTML =  `   <div onclick="Supplier.formSupplierSupply()" class="float-left form-inline text-primary">
-   <button class="btn btn-outline-primary mr-2"><i class="fas fa-cubes"> Add Supply</i></h5></button>
-   </div>
-  
-   <div onclick="Supplier.formSupplierTransac()" class="float-left form-inline text-primary">
-   <button class="btn btn-outline-primary mr-2"><i class="fas fa-hand-holding-usd"> Transaction</i></button>
-   </div>`;
-   stock.classList.add('faa-bounce')
-   stock.classList.add('animated');
-
-   create.classList.remove('faa-horizontal');
-   create.classList.remove('animated');
-
-   fetchs.classList.remove('faa-pulse');
-   fetchs.classList.remove('animated');
- 
- }
-
- static FetchingSupply(){
-  options.innerHTML = '';
-  supplier.innerHTML = '';
-  message.innerHTML = '';
-  Supplier.fetchSupply();
-  options.innerHTML = `  <div onclick="Supplier.fetchSupply()" class="float-left form-inline">
-  <button class="btn btn-outline-info mr-2"><i class="fas fas fa-boxes"> Supply</i></button>
-  </div>
-
-  <div onclick="Supplier.fetchTransac()" class="float-left form-inline">
-  <button class="btn btn-outline-info"><i class="far fa-handshake"> Transaction</i></h5></button>
-  </div>
-
-  <div onclick="Supplier.fetchSupplier()" class="float-left form-inline">
-  <button class="btn btn-outline-info ml-2"><i class="fas fa-address-book"> Supplier</i></h5></button>
-  </div>`;
-
-  fetchs.classList.add('faa-pulse');
-  fetchs.classList.add('animated');
-
-  stock.classList.remove('faa-bounce')
-  stock.classList.remove('animated');
-
-  create.classList.remove('faa-horizontal');
-  create.classList.remove('animated');
-
-  
-  const searchForm = document.querySelector('#searchForm');
-
- }
- 
- static formSupplierPerson() {
-      message.innerHTML = '';
-      supplier.innerHTML = '';
-      supplier.innerHTML = `
-      <form id="cSupplier" class="text-success">
-      <center><h1><b>Add a supplier information</b></h1></center>
-      <div class="form-group">
-      <label for="exampleInputEmail1"><b>First Name</b></label>
-      <input type="text" class="form-control" id="first" name="first" placeholder="Required a maximum of 30 value">
-      </div>
-      <div class="form-group">
-      <label for="exampleInputEmail1"><b>Last Name</b></label>
-      <input type="text" class="form-control" id="last" name="last" placeholder="Required a maximum of 30 value">
-      </div>
-      <div class="form-group">
-      <label for="exampleInputEmail1"><b>Company Name</b></label>
-      <input type="text" class="form-control" id="company" name="company" placeholder="Required a maximum of 30 value">
-      </div>
-      <div class="form-group">
-      <label for="exampleInputEmail1"><b>Contact Number</b></label>
-      <input type="text" class="form-control" id="contact" name="contact" placeholder="eg. 0926214112 exactly 11 value only">
-      </div>
-      <input type="submit" class="form-control btn btn-outline-success" name="submit" value="Submit">
-      </form>`;
-
-      const cSupplier = document.querySelector('#cSupplier');
-
-      cSupplier.addEventListener('submit',function(x){
-        x.preventDefault();
-        Supplier.registerSupplier();
-      })
- }
-
- static formSupplierSupply() {
-  message.innerHTML = '';
-  supplier.innerHTML = '';
-  supplier.innerHTML = `
-  <form id="SuppSupply" class="text-primary">
-  <center><h1><b>Add new supply ID</b></h1></center>
-  <div class="form-group">
-  <label for="exampleInputEmail1"><b>Supply ID</b></label>
-  <input type="text" class="form-control" id="supply_id" name="supply_id" placeholder="Required an exactly 5 value">
-  </div>
-  <div class="form-group">
-  <label for="exampleInputEmail1"><b>Reference Name</b></label>
-  <input type="text" class="form-control" id="ref_name" name="ref_name" placeholder="Required a maximun of 25 value">
-  </div>
-  <input type="submit" class="form-control btn btn-outline-primary" name="submit" value="Submit">
-  </form>`;
-  const SuppSupply = document.querySelector('#SuppSupply');
-
-  SuppSupply.addEventListener('submit',function(x){
-    x.preventDefault();
-    Supplier.registerSupplyID();
-  });
- }
-
- static formSupplierTransac() {
-  message.innerHTML = '';
-  supplier.innerHTML = '';
-  supplier.innerHTML += `<form id="SuppTransac" class="text-primary">
-  <center><h1><b>Supplier Transaction</b></h1></center>
-  <div class="form-group">
-  <label for="exampleInputEmail1"><b>Supplier's Name</b></label>
-  <select class="form-control" name="supply_name" id="supply_name">
-  </select>
-  </div>
-  <div class="form-group">
-  <label for="exampleInputEmail1"><b>Supply ID</b></label>
-  <input type="text" class="form-control" id="supply_id" name="supply_id" placeholder="Required an exactly 5 value">
-  </div>
-
-  <div class="form-group">
-  <label for="exampleInputEmail1"><b>Quantity</b></label>
-  <input type="text" class="form-control" id="quantity" name="quantity" placeholder="Required a maximum of 10 value">
-  </div>
-
-  <div class="form-group">
-  <label for="exampleInputEmail1"><b>Unit Price</b></label>
-  <input type="text" class="form-control" id="unit_price" name="unit_price" placeholder="Required a maximum of 10 value">
-  </div>
-
-  <input type="submit" class="form-control btn btn-outline-primary" name="submit" value="Submit">
-  </form>`;
-
-  Main.getData('GET','HTTP/GET/supplier/suppliernamefetch.php')
-  .then((data)=>{
-   let list = JSON.parse(data);
-   const supply_name = document.querySelector('#supply_name');
-   for(let i = 0;i < list.name.length;i++) {
-     supply_name.innerHTML += `<option value="${list.name[i]}">${list.name[i]}</option>`;
-   }
-   });
-
-    const SuppTransac = document.querySelector('#SuppTransac');
-
-    SuppTransac.addEventListener('submit',function(x){
-      x.preventDefault();
-      Supplier.suppyTransac();
-    });
+        protected function UpdatedSupplier($conn,$id,$u_id,$f,$l,$com,$con){
+          $first = $conn->real_escape_string(ucfirst($f));
+          $last = $conn->real_escape_string(ucfirst($l));
+          $company = $conn->real_escape_string(ucfirst($com));
+          $contact = $conn->real_escape_string($con);
+          $updated_at = $conn->real_escape_string(date('Y-m-d H:i:s'));
+          $sql = "UPDATE supplier_person 
+          SET user_id = ?, fn = ?, ln = ?, company = ?, contact = ?, person_updated_at = ?
+          WHERE person_id = ?;";
+          $stmt = $conn->stmt_init();
+          if(!$stmt->prepare($sql)){
+            die($stmt->error);
+            exit();
+          } else {
+            $stmt->bind_param('isssssi',$u_id,$first,$last,$company,$contact,$updated_at,$id);
+            if(!$stmt->execute()){
+              die($stmt->error);
+              exit();
+            }else {
+              echo 'success';
+            }
+          }
+        }
+        //Trasnsaction
+        protected function SupplierSupply($conn,$p_name,$u_id,$s_id,$q,$u_p) {
+          $generate_id = strtoupper(substr(str_shuffle('abcdefghijklmnopqrstuvwxyz0123456789'),0,6));
+          $trans_id = $conn->real_escape_string($generate_id);
+          $user_id = $conn->real_escape_string($u_id);
+          $supply_id = $conn->real_escape_string(strtoupper($s_id));
+          $quantity = $conn->real_escape_string($q);
+          $unit_price = $conn->real_escape_string($u_p);
+      
+          $arrString = explode(' ',$p_name);
+          $first = $arrString[0];
+          $last = $arrString[1];
     
- }
+          $sqlPerson = "SELECT * FROM supplier_person WHERE fn=? AND ln=?;";
+          $stmtPerson = $conn->stmt_init();
+          if(!$stmtPerson->prepare($sqlPerson)) {
+            die($stmtPerson->error.' - code line 79');
+            exit();
+          } else {
+            
+            $stmtPerson->bind_param('ss',$first,$last);
+            if(!$stmtPerson->execute()) {
+              die($stmtPerson->error.' - code line 85');
+              exit();
+            } else {
+              $resultPerson = $stmtPerson->get_result();
+              if($resultPerson->num_rows > 0) {
+                if($rowPerson = $resultPerson->fetch_assoc()){
+                  $p_id = $rowPerson['person_id'];
+                }
+                $person_id = $conn->real_escape_string($p_id);
+              }
+            }
+          }
 
- static registerSupplier() {
+          $sqlExist = "SELECT * FROM supplier_supply WHERE supply_id = ?;";
+          $stmtExist = $conn->stmt_init();
 
-  let first = document.querySelector('#first').value;
-  let last = document.querySelector('#last').value;
-  let company = document.querySelector('#company').value;
-  let contact = document.querySelector('#contact').value;
+          if(!$stmtExist->prepare($sqlExist)) {
+            die($stmtExist->error.' - code line 103');
+            exit();
+          } else {
+            $stmtExist->bind_param('s',$supply_id);
+            if(!$stmtExist->execute()) {
+              die($stmtExist->error.' - code line 108');
+              exit();
+            } else {
+              $result = $stmtExist->get_result();
+              if($result->num_rows >= 1) {
+                $sql = "INSERT INTO supplier_transac(transac_id,supp_person_id,supp_user_id,supp_product_id,quantity,unit_price) 
+                VALUES(?,?,?,?,?,?);";
+                $stmt = $conn->stmt_init();
+                if(!$stmt->prepare($sql)) {
+                  die($stmt->error.' - code line 118');
+                  exit();
+                } else {
+                  $stmt->bind_param('siisid',$trans_id,$person_id,$user_id,$supply_id,$quantity,$unit_price);
+                  if(!$stmt->execute()) {
+                    die($stmt->error);
+                    exit();
+                  } else {
+                 
+                    $sqlGet = "SELECT * FROM supplier_transac
+                    INNER JOIN supplier_supply 
+                    ON supplier_transac.supp_product_id = supplier_supply.supply_id
+                    where supplier_transac.supp_product_id = ?;";
+                    $stmtGet = $conn->stmt_init();
+                    if(!$stmtGet->prepare($sqlGet)) {
+                      die($stmtGet->error);
+                      exit();
+                    } else {
+                      $stmtGet->bind_param('s',$supply_id);
+                      if(!$stmtGet->execute()) {
+                        die($stmtGet->error);
+                        exit();
+                      } else {
+                        $result = $stmtGet->get_result();
+                        if($result->num_rows > 0) {
+                          if($row = $result->fetch_assoc()) {
+                            $get_stock = $row['stock'];
+                            $get_quantity = $row['quantity'];
+                          }
+                        
+                          $new_stock = $get_stock + $get_quantity;
+                          $updated_at = date('Y-m-d H:i:s');
+                          $sqlUpdate = "UPDATE supplier_supply SET stock = ?, supply_updated_at = ?
+                          WHERE supply_id = ?;";
+                          $stmtUpdate = $conn->stmt_init();
+                          if(!$stmtUpdate->prepare($sqlUpdate)) {
+                            die($stmtUpdate->error);
+                            exit();
+                          } else {
+                            
+                            $stmtUpdate->bind_param('iss',$new_stock,$updated_at,$supply_id);
+                            if(!$stmtUpdate->execute()) {
+                              die($stmtUpdate->error);
+                              exit();
+                            } else {
+                              echo 'success';
+                              exit();
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              } else {
+                echo 'not exist';
+                exit();
+              }
+          }
+         }
+        }
 
-  let params = ['first=',first,'&last=',last,'&company=',company,'&contact=',contact];
-  
-  Main.postData('POST','HTTP/POST/supplier/supplierperson.php',params)
-  .then((data)=>{
-   // console.log(data);
-    if(data == 'success') {
-      supplier.innerHTML = `<center><h1 class="text-success"><b>The supplier person was added</b></h1></center>
-        <input type="button" class="form-control btn btn-outline-secondary mt-2" value="Back to the table">`;
-      // console.log(xhr.responseText);
-      } else if(data == 'empty') {
-        message.innerHTML = `<center><h3 class="text-danger"><b>Please fill out all the forms</b></h3></center>`;
-      } 
-      else if(data == 'cannot') {
-        message.innerHTML = `<center><h3 class="text-danger"><b>Please do not include any special character or not required character in specific form</b></h3></center>`;
-      } else if(data == 'count') {
-        message.innerHTML = `<center><h3 class="text-danger"><b>Please follow the requirement of the fields</b></h3></center>`;
-      }
-  })
-  .catch((err)=>{
-    console.log(err);
-  });
+        protected function FetchTransaction($conn,$s,$l,$o){
+          if($l == ''){
+            $l = 5;
+          }
+          if($o == 'ASC'){
+            $sql ="SELECT * FROM supplier_transac
+            INNER JOIN supplier_person
+            ON supplier_transac.supp_person_id = supplier_person.person_id
+            INNER JOIN users
+            ON supplier_transac.supp_user_id = users.id
+            WHERE supplier_person.fn 
+            LIKE '$s%' 
+            OR supplier_person.ln 
+            LIKE '$s%'
+            ORDER BY supplier_transac.transac_created_at
+            ASC
+            LIMIT
+            $l;";
+          } else if($o == 'DESC'){
+            $sql ="SELECT * FROM supplier_transac
+            INNER JOIN supplier_person
+            ON supplier_transac.supp_person_id = supplier_person.person_id
+            INNER JOIN users
+            ON supplier_transac.supp_user_id = users.id
+            WHERE supplier_person.fn 
+            LIKE '$s%' 
+            OR supplier_person.ln 
+            LIKE '$s%'
+            ORDER BY supplier_transac.transac_created_at
+            DESC
+            LIMIT
+            $l;";
+          }
+       
+          $stmt = $conn->stmt_init();
+          if(!$stmt->prepare($sql)) {
+            die($stmt->error);
+            exit();
+          } else{
+            if(!$stmt->execute()){
+              die($stmt->error);
+              exit();
+            }else {
+              $result = $stmt->get_result();
+              $id = [];
+              $transac_id = [];
+              $supp_person_name = [];
+              $supp_user_name = [];
+              $supp_product_id = [];
+              $quantity = [];
+              $unit_price = [];
+              $created_at = [];
+              $updated_at = [];
+              if($result->num_rows > 0) {
+                while($row = $result->fetch_assoc()){
+                  array_push($id,$row['t_id']);
+                  array_push($transac_id,$row['transac_id']);
+                  array_push($supp_person_name,$row['fn'] . ' ' . $row['ln']);
+                  array_push($supp_user_name,$row['user_fn'] . ' ' . $row['user_ln']);
+                  array_push($supp_product_id ,$row['supp_product_id']);
+                  array_push($quantity,number_format($row['quantity'],2));
+                  array_push($unit_price,'₱ ' . number_format($row['unit_price'],2));
+                  array_push($created_at,date( "F d Y h:i A", strtotime($row['transac_created_at'])));
+                  array_push($updated_at,date( "F d Y h:i A", strtotime($row['transac_updated_at'])));
+                }
+              } else {
+                array_push($id,0);
+                array_push($transac_id,'no search found');
+                array_push($supp_person_name,'no search found');
+                array_push($supp_user_name,'no search found');
+                array_push($supp_product_id ,'no search found');
+                array_push($quantity,'no search found');
+                array_push($unit_price,'no search found');
+                array_push($created_at,'no search found');
+                array_push($updated_at,'no search found');
+              }
+                $data = array(
+                  "id" => $id,
+                  "transac_id" =>   $transac_id,
+                  "supp_person_name" =>  $supp_person_name,
+                  "supp_user_name" =>  $supp_user_name,
+                  "supp_product_id" => $supp_product_id,
+                  "quantity" => $quantity,
+                  "unit_price" => $unit_price,
+                  "created_at" => $created_at,
+                  "updated_at" => $updated_at
+                );
+                 echo json_encode($data);
+              
+            }
+          }
+        }    
 
- }
+        protected function FetchSupplierName($conn){
+          $sql = "SELECT * FROM supplier_person;";
+          $stmt = $conn->stmt_init();
+          if(!$stmt->prepare($sql)){
+            die($stmt->error.' - line code 181');
+            exit();
+          } else {
+            if(!$stmt->execute()){
+              die($stmt->error.' - line code 185');
+              exit();
+            } else {
+              $result = $stmt->get_result();
+              $name = [];
+              if($result->num_rows > 0) {
+                while($row = $result->fetch_assoc()){
+                 array_push($name,$row['fn'] . ' ' . $row['ln']);
+                }
+                $data = array("name"=>$name);
+                echo json_encode($data);
+              }
+            }
+          }
+        }
 
- static registerSupplyID() {
+        protected function DeleteSupp_Transac($conn,$id){
+          $sql = "DELETE FROM supplier_transac WHERE t_id = ?;";
+          $stmt = $conn->stmt_init();
+          if(!$stmt->prepare($sql)) {
+              die($stmt->error);
+              exit();
+          } else {
+              $stmt->bind_param('s',$id);
+              if(!$stmt->execute()) {
+                  die($stmt->error);
+                  exit();
+              } else {
+                  echo 'delete';
+                  exit();
+              }
+          }    
+        }
 
-  const supply_id = document.querySelector('#supply_id').value;
-  const ref_name = document.querySelector('#ref_name').value;
+        protected function ShowTransaction($conn,$id){
+            $sql ="SELECT * FROM supplier_transac
+            INNER JOIN supplier_person
+            ON supplier_transac.supp_person_id = supplier_person.person_id
+            INNER JOIN users
+            ON supplier_transac.supp_user_id = users.id
+            WHERE supplier_transac.t_id = $id;";
+          $result = $conn->query($sql);
+              if($result->num_rows > 0) {
+                while($row = $result->fetch_assoc()){
+                  $data = array(
+                    "transac_id" => $row['transac_id'],
+                    "supp_person_name" => $row['fn'] . ' ' . $row['ln'],
+                    "supp_user_name" => $row['user_fn'] . ' ' . $row['user_ln'],
+                    "supp_product_id" => $row['supp_product_id'],
+                    "quantity" => number_format($row['quantity'],2),
+                    "unit_price" => '₱ ' . number_format($row['unit_price'],2),
+                    "created_at" => date( "F d Y h:i A", strtotime($row['transac_created_at'])),
+                    "updated_at" => date( "F d Y h:i A", strtotime($row['transac_updated_at']))
+                  );
 
-  let params = ['supply_id=',supply_id,'&ref_name=',ref_name];
-  
-  Main.postData('POST','HTTP/POST/supplier/suppliersupply_id.php',params)
-  .then((data)=>{
+                }
+                echo json_encode($data);
+              }
+        }
 
-    if(data == 'success') {
-      message.innerHTML = '';
-      supplier.innerHTML = `<center><h1 class="text-info"><b>The supply was added</b></h1></center>
-        <input type="button" class="form-control btn btn-outline-secondary mt-2" value="Back to Supply ID" onclick="Supplier.formSupplierSupply()">`;
-      // console.log(xhr.responseText);
-      } else if(data == 'empty') {
-        message.innerHTML = `<center><h3 class="text-danger"><b>Please fill out all the forms</b></h3></center>`;
-      } 
-      else if(data == 'cannot') {
-        message.innerHTML = `<center><h3 class="text-danger"><b>Please do not include any letters</b></h3></center>`;
-      } else if(data == 'taken') {
-        message.innerHTML = `<center><h3 class="text-danger"><b>Please put unique a supply id</b></h3></center>`;
-      } else if(data == 'count') {
-        message.innerHTML = `<center><h3 class="text-danger"><b>Please follow the requirement of the fields</b></h3></center>`;
-      }
-  })
-  .catch((err)=>{
-    console.log(err);
-  });
+        protected function UpdateTransaction($conn,$id,$u_id,$q,$u_p){
+          $quantity = $conn->real_escape_string($q);
+          $unit_price = $conn->real_escape_string($u_p);
+          $updated_at = $conn->real_escape_string(date('Y-m-d H:i:s'));
 
- }
+          $sql = "UPDATE supplier_transac 
+          SET supp_user_id =?,quantity=?,unit_price=?,transac_updated_at =?
+          WHERE t_id = ?;";
 
- static suppyTransac(){
-  const supply_name = document.querySelector('#supply_name').value;
-  const supply_id = document.querySelector('#supply_id').value;
-  const quantity = document.querySelector('#quantity').value;
-  const unit_price = document.querySelector('#unit_price').value;
+          $stmt = $conn->stmt_init();
+          if(!$stmt->prepare($sql)){
+            die($stmt->error);
+            exit();
+          } else {
 
-  let params = ['supply_name=',supply_name,'&supply_id=',supply_id,
-  '&quantity=',quantity,'&unit_price=',unit_price];
-
-  Main.postData('POST','HTTP/POST/supplier/suppliertransac.php',params)
-  .then((data)=>{
-    console.log(data);
-    if(data == 'success') {
-      message.innerHTML = '';
-      supplier.innerHTML = `<center><h1 class="text-info"><b>Transaction was finished</b></h1></center>
-        <input type="button" class="form-control btn btn-outline-secondary mt-2" value="Back to Supply ID" onclick="Supplier.formSupplierSupply()">`;
-      // console.log(xhr.responseText);
-      } else if(data == 'empty') {
-        message.innerHTML = `<center><h3 class="text-danger"><b>Please fill out all forms</b></h3></center>`;
-      } 
-      else if(data == 'cannot') {
-        message.innerHTML = `<center><h3 class="text-danger"><b>Some of the field not required to put special characters or not related to field</b></h3></center>`;
-      } else if(data == 'not exist') {
-        message.innerHTML = `<center><h3 class="text-danger"><b>The supply id is invalid</b></h3></center>`;
-      } else if(data == 'count') {
-        message.innerHTML = `<center><h3 class="text-danger"><b>Please follow the requirement of the fields</b></h3></center>`;
-      }
-  })
-  .catch((err)=>{
-    console.log(err);
-  })
- }
-
- static fetchSupply(){
-  Supplier.DelModalSupply();
-  supplier.innerHTML = '';
-  message.innerHTML = '';
-  supplier.innerHTML += `<h1 class="text-info mt-1"><b><center>Supply Table</center><b></h1>
-  <div class="form-inline mb-3 mt-4">
-  <form id="searchForm">
-     <div class="form-group">
-       <div class="text-light input-group-addon bg"><i id="lighten1" class="text-info fas fa-search"></i></div>
-       <input class="form-control border-info" type="text" name="search" id="search">
-
-       <div class="text-light input-group-addon bg ml-2"><i id="lighten2" class="text-info fas fa-database"></i></div>
-       <input class="form-control border-info" type="text" name="val" id="val">
-       </div>
-       </form>
-
-   <form id="orderForm">
-   <div class="form-group">
-       <div class="text-light input-group-addon ml-2"><i id="lighten3" class="text-info fas fa-sort"></i></div>
-       <select class="form-control" id="order" name="order">
-       <option value="ASC">ASCENDING ORDER</option>
-       <option value="DESC">DESCENDING ORDER</option>
-       </select>
-   </div>
-   </form>
-  </div>
-
-  <table class="table table-hover border-info">
-  <thead>
-    <tr class="table-info">
-      <th scope="col">Supply ID</th>
-      <th scope="col">Reference Name</th>
-      <th scope="col">Status</th>
-      <th scope="col">Stock</th>
-      <th scope="col">Action</th>
-    </tr>
-  </thead>
-  <tbody id="supply">
-  </tbody>
-   </table>`;
-   const search = document.querySelector('#search').value; 
-   const val = document.querySelector('#val').value;
-   const order = document.querySelector('#order').value;
-   const params = ['search=',search,'&val=',val,'&order=',order]; 
-   Main.postData('POST','HTTP/GET/supplier/supplierfetchsupply.php',params)
-    .then((data)=>{
-     let d = JSON.parse(data);
-     const supply = document.querySelector('#supply');
-     for(let i = 0; i < d.supply_id.length;i++){
-       supply.innerHTML += `<tr class="table-default">
-       <th scope="row" style="width: 15%">${d.supply_id[i]}</th>
-       <td style="width: 35%">${d.ref_name[i]}</td>
-       <td style="width: 20%">${d.status[i]}</td>
-       <td style="width: 15%">${d.stock[i]}</td>
-       <td style="width: 20%">
-        <i class="fas fa-edit text-danger faa-vertical animated-hover ml-2" onclick=""></i>
-        <i class="fas fa-trash-alt faa-wrench animated-hover text-warning ml-2" onclick="Supplier.delSessId(${d.id[i]})" data-toggle="modal" data-target="#del"></i>
-        <i class="fa fa-eye faa-pulse animated-hover text-info ml-2" onclick=""></i>
-        </td>
-       </tr>`;
-     }
-   })
- 
-
-   const searchForm = document.querySelector('#searchForm');
-   const orderForm = document.querySelector('#orderForm');
-   searchForm.addEventListener('keyup',(x)=>{
-     x.preventDefault();
-     supply.innerHTML = '';
-    
-     const search = document.querySelector('#search').value; 
-     const val = document.querySelector('#val').value;
-     const order = document.querySelector('#order').value;
-     const params = ['search=',search,'&val=',val,'&order=',order]; 
-     Main.postData('POST','HTTP/GET/supplier/supplierfetchsupply.php',params)
-     .then((data)=>{
-       let d = JSON.parse(data);
-      // console.log(d);
-       const supply = document.querySelector('#supply');
-       for(let i = 0; i < d.supply_id.length;i++){
-        supply.innerHTML += `<tr class="table-default">
-        <th scope="row" style="width: 15%">${d.supply_id[i]}</th>
-        <td style="width: 35%">${d.ref_name[i]}</td>
-        <td style="width: 20%">${d.status[i]}</td>
-        <td style="width: 15%">${d.stock[i]}</td>
-        <td style="width: 20%">
-         <i class="fas fa-edit text-danger faa-vertical animated-hover ml-2" onclick=""></i>
-         <i class="fas fa-trash-alt faa-wrench animated-hover text-warning ml-2" onclick="Supplier.delSessId(${d.id[i]})" data-toggle="modal" data-target="#del"></i>
-         <i class="fa fa-eye faa-pulse animated-hover text-info ml-2" onclick=""></i>
-         </td>
-        </tr>`;
-       }
-
-       if(search == '') {
-        lighten1.classList.remove('faa-pulse');
-        lighten1.classList.remove('animated');
-      } else {
-        lighten1.classList.add('faa-pulse');
-        lighten1.classList.add('animated');
-      }
-    
-      if(val == '') {
-        lighten2.classList.remove('faa-tada');
-        lighten2.classList.remove('animated');
-      } else {
-        lighten2.classList.add('faa-tada');
-        lighten2.classList.add('animated');
-      }
-
-     })
-     .catch((err)=>{
-       console.log(err);
-     });
-   });
-
-   orderForm.addEventListener('change',(x)=>{
-    x.preventDefault();
-    supply.innerHTML = '';
-   
-    const search = document.querySelector('#search').value; 
-    const val = document.querySelector('#val').value;
-    const order = document.querySelector('#order').value;
-    const params = ['search=',search,'&val=',val,'&order=',order]; 
-    Main.postData('POST','HTTP/GET/supplier/supplierfetchsupply.php',params)
-    .then((data)=>{
-      let d = JSON.parse(data);
-     // console.log(d);
-      const supply = document.querySelector('#supply');
-      for(let i = 0; i < d.supply_id.length;i++){
-        supply.innerHTML += `<tr class="table-default">
-        <th scope="row" style="width: 15%">${d.supply_id[i]}</th>
-        <td style="width: 35%">${d.ref_name[i]}</td>
-        <td style="width: 20%">${d.status[i]}</td>
-        <td style="width: 15%">${d.stock[i]}</td>
-        <td style="width: 20%">
-         <i class="fas fa-edit text-danger faa-vertical animated-hover ml-2" onclick=""></i>
-         <i class="fas fa-trash-alt faa-wrench animated-hover text-warning ml-2" onclick="Supplier.delSessId(${d.id[i]})" data-toggle="modal" data-target="#del"></i>
-         <i class="fa fa-eye faa-pulse animated-hover text-info ml-2" onclick=""></i>
-         </td>
-        </tr>`;
-      }
-
-
-      lighten3.classList.add('faa-vertical');
-      lighten3.classList.add('animated');
-  
-      setTimeout(function(){
-        lighten3.classList.remove('faa-vertical');
-        lighten3.classList.remove('animated');
-    
-      },1000);
-
-    })
-    .catch((err)=>{
-      console.log(err);
-    });
-   });
-
-
-   
- }
- 
- static fetchTransac(){
-  supplier.innerHTML = '';
-  message.innerHTML = '';
-  supplier.innerHTML += `<h1 class="text-info mt-1"><b><center>Transaction Table</center><b></h1>
-  <div class="form-inline mb-3 mt-4">
-  <form id="searchForm">
-     <div class="form-group">
-       <div class="text-light input-group-addon bg"><i id="lighten1" class="text-info fas fa-search"></i></div>
-       <input class="form-control border-info" type="text" name="search" id="search">
-
-       <div class="text-light input-group-addon bg ml-2"><i id="lighten2" class="text-info fas fa-database"></i></div>
-       <input class="form-control border-info" type="text" name="val" id="val">
-       </div>
-       </form>
-
-   <form id="orderForm">
-   <div class="form-group">
-       <div class="text-light input-group-addon ml-2"><i id="lighten3" class="text-info fas fa-sort"></i></div>
-       <select class="form-control" id="order" name="order">
-       <option value="DESC">DESCENDING ORDER</option>
-       <option value="ASC">ASCENDING ORDER</option>
-       </select>
-   </div>
-   </form>
-  </div>
-
-  <table class="table table-hover border-info">
-  <thead>
-    <tr class="table-info">
-      <th scope="col">Transac ID</th>
-      <th scope="col">Supplier Name</th>
-      <th scope="col">Registrar</th>
-      <th scope="col">Quantity</th>
-      <th scope="col">Unit Price</th>
-      <th scope="col">Date Issued</th>
-      <th scope="col">Action</th>
-    </tr>
-  </thead>
-  <tbody id="supply"></tbody>
-  </table>`;
-
-  const search = document.querySelector('#search').value; 
-  const val = document.querySelector('#val').value;
-  const order = document.querySelector('#order').value;
-  const params = ['search=',search,'&val=',val,'&order=',order]; 
-
-   Main.postData('POST','HTTP/GET/supplier/supplierfetchtransac.php',params)
-    .then((data)=>{
-     let d = JSON.parse(data);
-     const supply = document.querySelector('#supply');
-     for(let i = 0; i < d.supp_product_id.length;i++){
-      supply.innerHTML += `<tr class="table-default">
-      <th scope="row">${d.supp_product_id[i]}</th>
-      <td>${d.supp_person_name[i]}</td>
-      <td>${d.supp_user_name[i]}</td>
-      <td>${d.quantity[i]}</td>
-      <td>₱ ${d.unit_price[i]}</td>
-      <td>${d.created_at[i]}</td>
-      <td>No Action</td>
-    </tr>`
-    }
-   });
-   const searchForm = document.querySelector('#searchForm');
-   const orderForm = document.querySelector('#orderForm');
-
-  searchForm.addEventListener('keyup',(x)=>{
-    x.preventDefault();
-    supply.innerHTML = '';
-    console.log('response');
-    const search = document.querySelector('#search').value; 
-    const val = document.querySelector('#val').value;
-    const order = document.querySelector('#order').value;
-    const params = ['search=',search,'&val=',val,'&order=',order]; 
-    Main.postData('POST','HTTP/GET/supplier/supplierfetchtransac.php',params)
-    .then((data)=>{
-      let d = JSON.parse(data);
-      const supply = document.querySelector('#supply');
-      for(let i = 0; i < d.supp_product_id.length;i++){
-       supply.innerHTML += `<tr class="table-default">
-       <th scope="row">${d.supp_product_id[i]}</th>
-       <td>${d.supp_person_name[i]}</td>
-       <td>${d.supp_user_name[i]}</td>
-       <td>${d.quantity[i]}</td>
-       <td>₱ ${d.unit_price[i]}</td>
-       <td>${d.created_at[i]}</td>
-       <td>No Action</td>
-     </tr>`
-     }
-    })
-      .catch((err)=>{
-      console.log(err);
-       });
-  });
-
-  orderForm.addEventListener('change',(x)=>{
-   x.preventDefault();
-   supply.innerHTML = '';
-  
-   const search = document.querySelector('#search').value; 
-   const val = document.querySelector('#val').value;
-   const order = document.querySelector('#order').value;
-   const params = ['search=',search,'&val=',val,'&order=',order]; 
-   Main.postData('POST','HTTP/GET/supplier/supplierfetchtransac.php',params)
-   .then((data)=>{
-     let d = JSON.parse(data);
-     const supply = document.querySelector('#supply');
-     for(let i = 0; i < d.supp_product_id.length;i++){
-      supply.innerHTML += `<tr class="table-default">
-      <th scope="row">${d.supp_product_id[i]}</th>
-      <td>${d.supp_person_name[i]}</td>
-      <td>${d.supp_user_name[i]}</td>
-      <td>${d.quantity[i]}</td>
-      <td>₱ ${d.unit_price[i]}</td>
-      <td>${d.created_at[i]}</td>
-      <td>No Action</td>
-    </tr>`
-    }
-   })
-   .catch((err)=>{
-     console.log(err);
-   });
-  });
- }
-
- static fetchSupplier(){
-  supplier.innerHTML = '';
-  message.innerHTML = '';
-  supplier.innerHTML += `<h1 class="text-info mt-1"><b><center>Supplier Table</center><b></h1>
-  <div class="form-inline mb-3 mt-4">
-  <form id="searchForm">
-     <div class="form-group">
-       <div class="text-light input-group-addon bg"><i id="lighten1" class="text-info fas fa-search"></i></div>
-       <input class="form-control border-info" type="text" name="search" id="search">
-
-       <div class="text-light input-group-addon bg ml-2"><i id="lighten2" class="text-info fas fa-database"></i></div>
-       <input class="form-control border-info" type="text" name="val" id="val">
-       </div>
-       </form>
-
-   <form id="orderForm">
-   <div class="form-group">
-       <div class="text-light input-group-addon ml-2"><i id="lighten3" class="text-info fas fa-sort"></i></div>
-       <select class="form-control" id="order" name="order">
-       <option value="ASC">ASCENDING ORDER</option>
-       <option value="DESC">DESCENDING ORDER</option>
-       </select>
-   </div>
-   </form>
-  </div>
-
-  <table class="table table-hover border-info">
-  <thead>
-    <tr class="table-info">
-      <th scope="col">Name</th>
-      <th scope="col">Registrar</th>
-      <th scope="col">Company</th>
-      <th scope="col">Contact</th>
-      <th scope="col">Action</th>
-    </tr>
-  </thead>
-  <tbody id="supply">
-    </tbody>
-   </table>`;
-   const search = document.querySelector('#search').value; 
-   const val = document.querySelector('#val').value;
-   const order = document.querySelector('#order').value;
-   const params = ['search=',search,'&val=',val,'&order=',order]; 
-
-   Main.postData('POST','HTTP/GET/supplier/supplierfetch.php',params)
-    .then((data)=>{
-     let d = JSON.parse(data);
-   //  console.log(d);
-     const supply = document.querySelector('#supply');
-     for(let i = 0; i < d.name.length;i++){
-      supply.innerHTML += `<tr class="table-default">
-      <th scope="row">${d.name[i]}</th>
-      <td>${d.user_name[i]}</td>
-      <td>${d.company[i]}</td>
-      <td>${d.contact[i]}</td>
-      <td>No Action</td>
-    </tr>`
-    }
-   });
-
-   const searchForm = document.querySelector('#searchForm');
-   const orderForm = document.querySelector('#orderForm');
-
-  searchForm.addEventListener('keyup',(x)=>{
-    x.preventDefault();
-    supply.innerHTML = '';
-   
-    const search = document.querySelector('#search').value; 
-    const val = document.querySelector('#val').value;
-    const order = document.querySelector('#order').value;
-    const params = ['search=',search,'&val=',val,'&order=',order]; 
-    Main.postData('POST','HTTP/GET/supplier/supplierfetch.php',params)
-      .then((data)=>{
-      let d = JSON.parse(data);
-      // console.log(d);
-      const supply = document.querySelector('#supply');
-      for(let i = 0; i < d.name.length;i++){
-        supply.innerHTML += `<tr class="table-default">
-        <th scope="row">${d.name[i]}</th>
-        <td>${d.user_name[i]}</td>
-        <td>${d.company[i]}</td>
-        <td>${d.contact[i]}</td>
-        <td>No Action</td>
-      </tr>`
-      }
-
-      if(search == '') {
-       lighten1.classList.remove('faa-pulse');
-       lighten1.classList.remove('animated');
-     } else {
-       lighten1.classList.add('faa-pulse');
-       lighten1.classList.add('animated');
-     }
-   
-     if(val == '') {
-       lighten2.classList.remove('faa-tada');
-       lighten2.classList.remove('animated');
-     } else {
-       lighten2.classList.add('faa-tada');
-       lighten2.classList.add('animated');
-     }
-
-     })
-      .catch((err)=>{
-      console.log(err);
-       });
-  });
-
-  orderForm.addEventListener('change',(x)=>{
-   x.preventDefault();
-   supply.innerHTML = '';
-  
-   const search = document.querySelector('#search').value; 
-   const val = document.querySelector('#val').value;
-   const order = document.querySelector('#order').value;
-   const params = ['search=',search,'&val=',val,'&order=',order]; 
-   Main.postData('POST','HTTP/GET/supplier/supplierfetch.php',params)
-   .then((data)=>{
-     let d = JSON.parse(data);
-     //console.log(d);
-     const supply = document.querySelector('#supply');
-     for(let i = 0; i < d.name.length;i++){
-      supply.innerHTML += `<tr class="table-default">
-      <th scope="row">${d.name[i]}</th>
-      <td>${d.user_name[i]}</td>
-      <td>${d.company[i]}</td>
-      <td>${d.contact[i]}</td>
-      <td>No Action</td>
-    </tr>`
-    }
-
-
-     lighten3.classList.add('faa-vertical');
-     lighten3.classList.add('animated');
- 
-     setTimeout(function(){
-       lighten3.classList.remove('faa-vertical');
-       lighten3.classList.remove('animated');
-   
-     },1000);
-
-   })
-   .catch((err)=>{
-     console.log(err);
-   });
-  });
+            $sqlGet = "SELECT * FROM supplier_transac WHERE t_id = $id;";
+            $result = $conn->query($sqlGet);
+            if($result->num_rows > 0){
+              if($row = $result->fetch_assoc()){
+                $supply_id = $row['supp_product_id'];
+                $old_quantity = $row['quantity'];
+            }
+            if($quantity == $old_quantity){
+              
+              $stmt->bind_param('iidsi',$u_id,$quantity,$unit_price,$updated_at,$id);
+              if(!$stmt->execute()){
+                die($stmt->errror);
+                exit();
+              }else {
+                echo 'success';
+                exit();
+              }
+            }
+            else if($quantity > $old_quantity) {
+              $new_quantity = $quantity - $old_quantity;
+              $sqlSupply = "SELECT * from supplier_supply WHERE supply_id = '$supply_id';";
+              $resultSupply = $conn->query($sqlSupply);
+              if($resultSupply->num_rows > 0){
+                if($row = $resultSupply->fetch_assoc()){
+                  $old_stock = $row['stock'];
+                }
+              }
+              $new_stock = $old_stock + $new_quantity;
+              $sqlUpdate = "UPDATE supplier_supply SET stock = ? 
+              WHERE supply_id = ?;";
+              $stmtUpdate = $conn->stmt_init();
+              if(!$stmtUpdate->prepare($sqlUpdate)){
+                die($stmtUpdate->error);
+                exit();
+              }else{
+                $stmtUpdate->bind_param('is',$new_stock,$supply_id);
+                if(!$stmtUpdate->execute()){
+                  die($stmtUpdate->error);
+                  exit();
+                }else {
+                  $stmt->bind_param('iidsi',$u_id,$quantity,$unit_price,$updated_at,$id);
+                  if(!$stmt->execute()){
+                    die($stmt->errror);
+                    exit();
+                  }else {
+                    echo 'success_plus';
+                    exit(); 
+                }
+              }
+             }
+             } else if($quantity < $old_quantity) {
+            $new_quantity = $old_quantity - $quantity;
+            $sqlSupply = "SELECT * from supplier_supply WHERE supply_id = '$supply_id';";
+            $resultSupply = $conn->query($sqlSupply);
+            if($resultSupply->num_rows > 0){
+              if($row = $resultSupply->fetch_assoc()){
+                $old_stock = $row['stock'];
+              }
+            }
+            $new_stock = $old_stock - $new_quantity;
+            $sqlUpdate = "UPDATE supplier_supply SET stock = ? 
+              WHERE supply_id = ?;";
+              $stmtUpdate = $conn->stmt_init();
+              if(!$stmtUpdate->prepare($sqlUpdate)){
+                die($stmtUpdate->error);
+                exit();
+              }else{
+                $stmtUpdate->bind_param('is',$new_stock,$supply_id);
+                if(!$stmtUpdate->execute()){
+                  die($stmtUpdate->error);
+                  exit();
+                }else {
+                  $stmt->bind_param('iidsi',$u_id,$quantity,$unit_price,$updated_at,$id);
+                  if(!$stmt->execute()){
+                    die($stmt->errror);
+                    exit();
+                  }else {
+                    echo 'success_minus';
+                    exit(); 
+                }
+              }
+             }
+          }
+          
+            }
+          }
+        }
 
  }
-
- static DelModalSupply(){
-  del.innerHTML = `
-  <div class="modal-dialog text-warning" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title"><i class="fas fa-exclamation-circle faa-bounce animated fa-md"></i> <b>Delete</b></h3>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>Are you sure you want to delete this item?</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-warning" onclick="Supplier.DeleteSupply()" data-dismiss="modal">Confirm</button>
-        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
-      </div>
-    </div>
-  </div>`;
- }
-
- static DeleteSupply(){
-  let id = JSON.parse(sessionStorage.getItem('del_id'));
-  let params = ["hid="+id.del];
-  Main.postData('POST','HTTP/DELETE/supplier/deletesupply.php',params)
-  .then((data)=>{
-    console.log(data);
-    Supplier.fetchSupply();
-  })
-  .catch((err)=>{
-    console.log(err);
-  })
- 
- }
-
- static delSessId(id) {
-  let d = {
-    del:id
-  }
-  if(sessionStorage.getItem('del_id') == null) {
-    sessionStorage.setItem('del_id',JSON.stringify(d));
-  } else {
-    let data = JSON.parse(sessionStorage.getItem('del_id'))
-  //  console.log(data.del);
-    data.del = id;
-    sessionStorage.setItem('del_id',JSON.stringify(data));
-  }
- }
- 
-}
-
-
-
-// Button 
-btnTodo.addEventListener('click',function(x){
-  x.preventDefault();
-  if(bolTodo) {
-    Todo.MainTodo();
-    bolTodo = false;
-    bolSupplier = true;
-  } else {
-    mainElement.innerHTML = '';
-    bolTodo = true;
-  }
-
-});
-
-btnSupplier.addEventListener('click',function(x){
-  x.preventDefault();
-  if(bolSupplier) {
-    Supplier.MainSupplier();
-    bolSupplier = false;
-    bolTodo = true;
-  } else {
-    mainElement.innerHTML = '';
-    bolSupplier = true;
-  }
-})
 

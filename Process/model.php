@@ -166,6 +166,8 @@ class TodoModel extends Model {
 }
 
 class SupplierModel extends Model {
+
+    // Insert Data
     public function modelSupplierPerson($fn,$ln,$company,$contact) {
         $conn = $this->connection();
         $id = $_SESSION['u_id'];
@@ -183,6 +185,7 @@ class SupplierModel extends Model {
         $this->SupplierSupply($conn,$person_name,$id,$supply_id,$quantity,$unit_price);
     }
 
+    // Fetch Data
     public function modelFetchSupplierName(){
         $conn = $this->connection();
         $this->FetchSupplierName($conn);
@@ -203,18 +206,61 @@ class SupplierModel extends Model {
         $this->FetchTransaction($conn,$search,$limit,$order);
     }
 
+    // Delete Data
     public function modelDeleteSupply($id){
         $conn = $this->connection();
         $this->DeleteSupply($conn,$id);
     }
 
+    public function modelDeleteSupplier($id){
+        $conn = $this->connection();
+        $this->DeleteSupplier($conn,$id);
+    }
+
+    public function modelDeleteSupp_Transac($id) {
+        $conn = $this->connection();
+        $this->DeleteSupp_Transac($conn,$id);
+    }
+
+    // Show Data
     public function modelShowSupply($id){
         $conn = $this->connection();
         $this->ShowSupply($conn,$id);
     }
+
+    public function modelShowSupplier($id){
+        $conn = $this->connection();
+        $this->ShowSupplier($conn,$id);
+    }
+
+    public function modelShowTransaction($id){
+        $conn = $this->connection();
+        $this->ShowTransaction($conn,$id);
+    }
+
+    // Update Data
+    public function modelUpdatedSupply($id,$supply_id,$ref_name){
+        $conn = $this->connection();
+        $this->UpdatedSupply($conn,$id,$supply_id,$ref_name);
+    }
+
+    public function modelUpdatedSupplier($id,$first,$last,$company,$contact){
+        $conn = $this->connection();
+        $u_id = $_SESSION['u_id'];
+        $this->UpdatedSupplier($conn,$id,$u_id,$first,$last,$company,$contact);
+    }
+
+    public function modelUpdateTransaction($id,$supply_id,$quantity,$unit_price){
+        $conn = $this->connection();
+        $u_id = $_SESSION['u_id'];
+        $this->UpdateTransaction($conn,$id,$u_id,$supply_id,$quantity,$unit_price);
+    }
 }
 
 $new = new SupplierModel();
+//$new->modelUpdateTransaction(1,2,600,5000);
+//$new->modelShowSupplier(2);
+//$new->modelUpdatedSupply('28','12345','Milo');
 //$new->modelShowSupply('28');
 //$new->modelDeleteSupply(18);
 //$new->modelFetchTransaction('',4,'ASC');

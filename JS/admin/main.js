@@ -96,9 +96,7 @@ function RemoveSetting(setting) {
 }
 
 function TimeFetch(fetchtime,url,who){ 
-    
       let xhr = new XMLHttpRequest();
-      
       let s = document.getElementById('search').value;
       let o = document.getElementById('val').value;
       let order = document.getElementById('order').value;
@@ -131,8 +129,8 @@ function TimeFetch(fetchtime,url,who){
               localStorage.setItem('counts',JSON.stringify(gett));
             } else {
              let gett = JSON.parse(localStorage.getItem('counts'));
-              console.log(gett[0].count);
-              console.log(cid);
+             // console.log(gett[0].count);
+            //  console.log(cid);
               if(gett[0].count < cid) {
                 gett[0] = get;
                 localStorage.setItem('counts',JSON.stringify(gett)); 
@@ -200,40 +198,24 @@ function LetDelete(id) {
     xhr.onreadystatechange = function(){
       if(xhr.readyState == 4 && xhr.status == 200) {
         xhr.responseText;
+        let gett = JSON.parse(localStorage.getItem('counts'));
+        if(ashow == true && ushow == true) {
+          return false;
+        }
+    
+        if(ushow == true && ashow == false) {
+            TimeFetch(userfetchtime,urluser,'User'); 
+          return false;
+        }
+        if(ashow == true && ushow == false) {
+          TimeFetch(adminfetchtime,urladmin,'Admin');  
+        }  
         }
    }
    xhr.onerror = function(){
      return xhr.statusText;
    }
     xhr.send(param);
-    let i = 0;
-    let gett = JSON.parse(localStorage.getItem('counts'));
-    let count = gett[0].count + 4;
-    if(ashow == true && ushow == true) {
-      while(i < count) {
-        TimeFetch(adminfetchtime,urladmin,'Admin');  
-        TimeFetch(userfetchtime,urluser,'User'); 
-        i++;
-      }
-      console.log('Delete Admin and User');
-      return false;
-    }
-
-    if(ushow == true && ashow == false) {
-      while(i < count) {
-        TimeFetch(userfetchtime,urluser,'User'); 
-        i++;
-      }
-      console.log('Delete User');
-      return false;
-    }
-    if(ashow == true && ushow == false) {
-      while(i < count) {
-        TimeFetch(adminfetchtime,urladmin,'Admin');  
-        i++;
-      }
-      console.log('Delete Admin');
-    }  
 }
 
 function Who(){

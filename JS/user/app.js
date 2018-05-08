@@ -104,7 +104,7 @@ class Todo {
     Main.getData('GET','HTTP/GET/todo/todofetch.php')
     .then((data)=> {
       let d = JSON.parse(data);
-      console.log(d);
+      //console.log(d);
       let output = ``;
       if(d.id == 0) {
         output += `<center><h1>Create new todo</h1></center>`;
@@ -266,8 +266,8 @@ class Supplier {
   </div>
 
   <div class="card-body">
+  <div id="message" class="mb-2"></div>
   <div class="mb-1 mt-1" id="options"></div>
-  <div id="message"></div>
   <div id="supplier"></div>
   </div>
   </div>`;
@@ -356,7 +356,7 @@ class Supplier {
 
     if(data == 'success') {
       message.innerHTML = '';
-      supplier.innerHTML = `<center><h1 class="text-info"><b>The supply was added</b></h1></center>
+      supplier.innerHTML = `<center><h1 class="text-primary"><b>The supply was added</b></h1></center>
         <input type="button" class="form-control btn btn-outline-secondary mt-2" value="Back to Supply ID" onclick="Supplier.formSupplierSupply()">`;
       // console.log(xhr.responseText);
       } else if(data == 'empty') {
@@ -374,6 +374,30 @@ class Supplier {
     console.log(err);
   });
 
+ }
+
+ static formSupplierSupply() {
+  message.innerHTML = '';
+  supplier.innerHTML = '';
+  supplier.innerHTML = `
+  <form id="SuppSupply" class="text-primary">
+  <center><h1><b>Add new supply ID</b></h1></center>
+  <div class="form-group">
+  <label for="exampleInputEmail1"><b>Supply ID</b></label>
+  <input type="text" class="form-control" id="supply_id" name="supply_id" placeholder="Required an exactly 5 value">
+  </div>
+  <div class="form-group">
+  <label for="exampleInputEmail1"><b>Reference Name</b></label>
+  <input type="text" class="form-control" id="ref_name" name="ref_name" placeholder="Required a maximun of 25 value">
+  </div>
+  <input type="submit" class="form-control btn btn-outline-primary" name="submit" value="Submit">
+  </form>`;
+  const SuppSupply = document.querySelector('#SuppSupply');
+
+  SuppSupply.addEventListener('submit',function(x){
+    x.preventDefault();
+    Supplier.registerSupplyID();
+  });
  }
 
  static fetchSupply(){
@@ -425,17 +449,29 @@ class Supplier {
      let d = JSON.parse(data);
      const supply = document.querySelector('#supply');
      for(let i = 0; i < d.supply_id.length;i++){
-       supply.innerHTML += `<tr class="table-default">
-       <th scope="row" style="width: 17.16%">${d.supply_id[i]}</th>
-       <td style="width: 30%">${d.ref_name[i]}</td>
-       <td style="width: 17.16%">${d.status[i]}</td>
-       <td style="width: 17.16%">${d.stock[i]}</td>
-       <td style="width: 23.5%">
-        <i class="fas fa-edit text-danger faa-vertical animated-hover ml-2" onclick=""></i>
-        <i class="fas fa-trash-alt faa-wrench animated-hover text-warning ml-2" onclick="Supplier.delSessId(${d.id[i]})" data-toggle="modal" data-target="#del"></i>
-        <i class="fa fa-eye faa-pulse animated-hover text-info ml-2" onclick="Supplier.ShowSupply(${d.id[i]})"></i>
-        </td>
-       </tr>`;
+       if(d.id[i] == 0){
+        supply.innerHTML += `<tr class="table-default">
+        <th scope="row" style="width: 17.16%">${d.supply_id[i]}</th>
+        <td style="width: 30%">${d.ref_name[i]}</td>
+        <td style="width: 17.16%">${d.status[i]}</td>
+        <td style="width: 17.16%">${d.stock[i]}</td>
+        <td style="width: 23.5%">
+          no search found
+         </td>
+        </tr>`;
+       } else {
+        supply.innerHTML += `<tr class="table-default">
+        <th scope="row" style="width: 17.16%">${d.supply_id[i]}</th>
+        <td style="width: 30%">${d.ref_name[i]}</td>
+        <td style="width: 17.16%">${d.status[i]}</td>
+        <td style="width: 17.16%">${d.stock[i]}</td>
+        <td style="width: 23.5%">
+         <i class="fas fa-edit text-danger faa-vertical animated-hover ml-2" onclick="Supplier.EditSupply(${d.id[i]})"></i>
+         <i class="fas fa-trash-alt faa-wrench animated-hover text-warning ml-2" onclick="Supplier.delSessId(${d.id[i]})" data-toggle="modal" data-target="#del"></i>
+         <i class="fa fa-eye faa-pulse animated-hover text-info ml-2" onclick="Supplier.ShowSupply(${d.id[i]})"></i>
+         </td>
+        </tr>`;
+       }
      }
    })
  
@@ -453,20 +489,32 @@ class Supplier {
      Main.postData('POST','HTTP/GET/supplier/supplierfetchsupply.php',params)
      .then((data)=>{
        let d = JSON.parse(data);
-      // console.log(d);
+      // //console.log(d);
        const supply = document.querySelector('#supply');
        for(let i = 0; i < d.supply_id.length;i++){
-        supply.innerHTML += `<tr class="table-default">
-        <th scope="row" style="width: 17.16%">${d.supply_id[i]}</th>
-        <td style="width: 30%">${d.ref_name[i]}</td>
-        <td style="width: 17.16%">${d.status[i]}</td>
-        <td style="width: 17.16%">${d.stock[i]}</td>
-        <td style="width: 23.5%">
-         <i class="fas fa-edit text-danger faa-vertical animated-hover ml-2" onclick=""></i>
-         <i class="fas fa-trash-alt faa-wrench animated-hover text-warning ml-2" onclick="Supplier.delSessId(${d.id[i]})" data-toggle="modal" data-target="#del"></i>
-         <i class="fa fa-eye faa-pulse animated-hover text-info ml-2" onclick="Supplier.ShowSupply(${d.id[i]})"></i>
-         </td>
-        </tr>`;
+        if(d.id[i] == 0){
+          supply.innerHTML += `<tr class="table-default">
+          <th scope="row" style="width: 17.16%">${d.supply_id[i]}</th>
+          <td style="width: 30%">${d.ref_name[i]}</td>
+          <td style="width: 17.16%">${d.status[i]}</td>
+          <td style="width: 17.16%">${d.stock[i]}</td>
+          <td style="width: 23.5%">
+            no search found
+           </td>
+          </tr>`;
+         } else {
+          supply.innerHTML += `<tr class="table-default">
+          <th scope="row" style="width: 17.16%">${d.supply_id[i]}</th>
+          <td style="width: 30%">${d.ref_name[i]}</td>
+          <td style="width: 17.16%">${d.status[i]}</td>
+          <td style="width: 17.16%">${d.stock[i]}</td>
+          <td style="width: 23.5%">
+           <i class="fas fa-edit text-danger faa-vertical animated-hover ml-2" onclick="Supplier.EditSupply(${d.id[i]})"></i>
+           <i class="fas fa-trash-alt faa-wrench animated-hover text-warning ml-2" onclick="Supplier.delSessId(${d.id[i]})" data-toggle="modal" data-target="#del"></i>
+           <i class="fa fa-eye faa-pulse animated-hover text-info ml-2" onclick="Supplier.ShowSupply(${d.id[i]})"></i>
+           </td>
+          </tr>`;
+         }
        }
 
        if(search == '') {
@@ -502,20 +550,32 @@ class Supplier {
     Main.postData('POST','HTTP/GET/supplier/supplierfetchsupply.php',params)
     .then((data)=>{
       let d = JSON.parse(data);
-     // console.log(d);
+     // //console.log(d);
       const supply = document.querySelector('#supply');
       for(let i = 0; i < d.supply_id.length;i++){
-        supply.innerHTML += `<tr class="table-default">
-        <th scope="row" style="width: 17.16%">${d.supply_id[i]}</th>
-        <td style="width: 30%">${d.ref_name[i]}</td>
-        <td style="width: 17.16%">${d.status[i]}</td>
-        <td style="width: 17.16%">${d.stock[i]}</td>
-        <td style="width: 23.5%">
-         <i class="fas fa-edit text-danger faa-vertical animated-hover ml-2" onclick=""></i>
-         <i class="fas fa-trash-alt faa-wrench animated-hover text-warning ml-2" onclick="Supplier.delSessId(${d.id[i]})" data-toggle="modal" data-target="#del"></i>
-         <i class="fa fa-eye faa-pulse animated-hover text-info ml-2" onclick="Supplier.ShowSupply(${d.id[i]})"></i>
-         </td>
-        </tr>`;
+        if(d.id[i] == 0){
+          supply.innerHTML += `<tr class="table-default">
+          <th scope="row" style="width: 17.16%">${d.supply_id[i]}</th>
+          <td style="width: 30%">${d.ref_name[i]}</td>
+          <td style="width: 17.16%">${d.status[i]}</td>
+          <td style="width: 17.16%">${d.stock[i]}</td>
+          <td style="width: 23.5%">
+            no search found
+           </td>
+          </tr>`;
+         } else {
+          supply.innerHTML += `<tr class="table-default">
+          <th scope="row" style="width: 17.16%">${d.supply_id[i]}</th>
+          <td style="width: 30%">${d.ref_name[i]}</td>
+          <td style="width: 17.16%">${d.status[i]}</td>
+          <td style="width: 17.16%">${d.stock[i]}</td>
+          <td style="width: 23.5%">
+           <i class="fas fa-edit text-danger faa-vertical animated-hover ml-2" onclick="Supplier.EditSupply(${d.id[i]})"></i>
+           <i class="fas fa-trash-alt faa-wrench animated-hover text-warning ml-2" onclick="Supplier.delSessId(${d.id[i]})" data-toggle="modal" data-target="#del"></i>
+           <i class="fa fa-eye faa-pulse animated-hover text-info ml-2" onclick="Supplier.ShowSupply(${d.id[i]})"></i>
+           </td>
+          </tr>`;
+         }
       }
 
 
@@ -549,7 +609,7 @@ class Supplier {
         </button>
       </div>
       <div class="modal-body">
-        <p>Are you sure you want to delete this item?</p>
+        <p>Are you sure you want to delete this item ?</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-warning" onclick="Supplier.DeleteSupply()" data-dismiss="modal">Confirm</button>
@@ -591,13 +651,14 @@ class Supplier {
   }
  }
 
- static ShowSupply($id){
-   supplier.innerHTML = '';
-  let params = ["hid="+$id];
+ static ShowSupply(id){
+   //console.log(id);
+  supplier.innerHTML = '';
+  let params = ["hid="+id];
   Main.postData('POST','HTTP/GET/supplier/suppliershowsupply.php',params)
   .then((data)=>{
     let d = JSON.parse(data);
-    console.log(d);
+    //console.log(d);
     supplier.innerHTML = `<br><br><br>
     <div class="card text-white bg-dark text-light mb-3" style="max-width: 54rem;">
     <div class="card-body">
@@ -607,7 +668,6 @@ class Supplier {
     <h4><b>Name: </b>${d.ref_name}</h4>
     <h4><b>Status: </b>${d.status}</h4>
     <h4><b>Stock: </b>${d.stock}</h4>
-    <h4><b>Number of involves: </b>${d.transaction}</h4>
     <h4><b>Created at: </b>${d.created_at}</h4>
     <h4><b>Updated at: </b>${d.updated_at}</h4>
     <input type="button" class="form-control btn btn-outline-secondary mt-2" onclick="Supplier.fetchSupply()" value="Back">
@@ -620,6 +680,79 @@ class Supplier {
     console.log(err);
   })
  
+ }
+
+ static EditSupply(id){
+  message.innerHTML = '';
+  supplier.innerHTML = '';
+  let params = ["hid="+id];
+  Main.postData('POST','HTTP/GET/supplier/suppliershowsupply.php',params)
+  .then((data)=>{
+    let d = JSON.parse(data);
+    supplier.innerHTML = `
+    <br><br><br>
+    <div class="card text-white bg-dark text-light mb-3" style="max-width: 54rem;">
+    <div class="card-body">
+    <div class="text-info">
+    <form id="UpdateSupply" class="text-info">
+    <center><h1><b>Edit the supply</b></h1></center>
+    <div class="form-group">
+    <label for="exampleInputEmail1"><b>Supply ID</b></label>
+    <input type="text" class="form-control" id="supply_id" name="supply_id" placeholder="Required an exactly 5 value" value="${d.supply_id}">
+    </div>
+    <div class="form-group">
+    <label for="exampleInputEmail1"><b>Reference Name</b></label>
+    <input type="text" class="form-control" id="ref_name" name="ref_name" placeholder="Required a maximun of 25 value" value="${d.ref_name}">
+    </div>
+    <input type="submit" class="mt-2 form-control btn btn-outline-info" name="submit" value="Submit">
+    <input type="button" class="mt-2 form-control btn btn-outline-secondary" onclick="Supplier.fetchSupply()" value="Back">
+    </form>
+    </div>
+    </div>`;
+    const UpdateSupply = document.querySelector('#UpdateSupply');
+  
+    UpdateSupply.addEventListener('submit',function(x){
+      x.preventDefault();
+      Supplier.UpdateSupply(id);
+    });
+  })
+  .catch((err)=>{
+    console.log(err);
+  })
+ }
+
+ static UpdateSupply(id){
+  const supply_id = document.querySelector('#supply_id').value;
+  const ref_name = document.querySelector('#ref_name').value;
+
+  let params = ['uid=',id,'&supply_id=',supply_id,'&ref_name=',ref_name];
+  
+  Main.postData('POST','HTTP/PUT/supplier/updatesupply.php',params)
+  .then((data)=>{
+    if(data == 'stock'){
+      message.innerHTML = `<center><h3 class="text-danger"><b>You cannot update a supply with filled stock</b></h3></center>`;
+    }
+    //console.log(data);
+    if(data == 'success') {
+      message.innerHTML = '';
+      supplier.innerHTML = `<br><br><br>
+        <center><h1 class="text-info"><b>The supply was updated</b></h1></center>
+        <input type="button" class="form-control btn btn-outline-secondary mt-2" value="Back to Supply ID" onclick="Supplier.fetchSupply()">`;
+      // console.log(xhr.responseText);
+      } else if(data == 'empty') {
+        message.innerHTML = `<center><h3 class="text-danger"><b>Please fill out all the forms</b></h3></center>`;
+      } 
+      else if(data == 'cannot') {
+        message.innerHTML = `<center><h3 class="text-danger"><b>Please do not include any letters</b></h3></center>`;
+      } else if(data == 'taken') {
+        message.innerHTML = `<center><h3 class="text-danger"><b>Please put unique a supply id</b></h3></center>`;
+      } else if(data == 'count') {
+        message.innerHTML = `<center><h3 class="text-danger"><b>Please follow the requirement of the fields</b></h3></center>`;
+      }
+  })
+  .catch((err)=>{
+    console.log(err);
+  });
  }
  
  // Supplier
@@ -656,33 +789,41 @@ class Supplier {
       })
  }
 
- static formSupplierSupply() {
-  message.innerHTML = '';
-  supplier.innerHTML = '';
-  supplier.innerHTML = `
-  <form id="SuppSupply" class="text-primary">
-  <center><h1><b>Add new supply ID</b></h1></center>
-  <div class="form-group">
-  <label for="exampleInputEmail1"><b>Supply ID</b></label>
-  <input type="text" class="form-control" id="supply_id" name="supply_id" placeholder="Required an exactly 5 value">
-  </div>
-  <div class="form-group">
-  <label for="exampleInputEmail1"><b>Reference Name</b></label>
-  <input type="text" class="form-control" id="ref_name" name="ref_name" placeholder="Required a maximun of 25 value">
-  </div>
-  <input type="submit" class="form-control btn btn-outline-primary" name="submit" value="Submit">
-  </form>`;
-  const SuppSupply = document.querySelector('#SuppSupply');
+ static registerSupplier() {
 
-  SuppSupply.addEventListener('submit',function(x){
-    x.preventDefault();
-    Supplier.registerSupplyID();
+  let first = document.querySelector('#first').value;
+  let last = document.querySelector('#last').value;
+  let company = document.querySelector('#company').value;
+  let contact = document.querySelector('#contact').value;
+
+  let params = ['first=',first,'&last=',last,'&company=',company,'&contact=',contact];
+  
+  Main.postData('POST','HTTP/POST/supplier/supplierperson.php',params)
+  .then((data)=>{
+   // console.log(data);
+    if(data == 'success') {
+      supplier.innerHTML = `<center><h1 class="text-success"><b>The supplier person was added</b></h1></center>
+        <input type="button" class="form-control btn btn-outline-secondary mt-2" value="Back to the table">`;
+      // console.log(xhr.responseText);
+      } else if(data == 'empty') {
+        message.innerHTML = `<center><h3 class="text-danger"><b>Please fill out all the forms</b></h3></center>`;
+      } 
+      else if(data == 'cannot') {
+        message.innerHTML = `<center><h3 class="text-danger"><b>Please do not include any special character or not required character in specific form</b></h3></center>`;
+      } else if(data == 'count') {
+        message.innerHTML = `<center><h3 class="text-danger"><b>Please follow the requirement of the fields</b></h3></center>`;
+      }
+  })
+  .catch((err)=>{
+    console.log(err);
   });
+
  }
 
  static fetchSupplier(){
   supplier.innerHTML = '';
   message.innerHTML = '';
+  Supplier.DelModalSupplier();
   supplier.innerHTML += `<h1 class="text-info mt-1"><b><center>Supplier Table</center><b></h1>
   <div class="form-inline mb-3 mt-4">
   <form id="searchForm">
@@ -710,7 +851,6 @@ class Supplier {
   <thead>
     <tr class="table-info">
       <th scope="col">Name</th>
-      <th scope="col">Registrar</th>
       <th scope="col">Company</th>
       <th scope="col">Contact</th>
       <th scope="col">Action</th>
@@ -726,17 +866,32 @@ class Supplier {
 
    Main.postData('POST','HTTP/GET/supplier/supplierfetch.php',params)
     .then((data)=>{
+
      let d = JSON.parse(data);
-   //  console.log(d);
+     ////console.log(d);
      const supply = document.querySelector('#supply');
      for(let i = 0; i < d.name.length;i++){
-      supply.innerHTML += `<tr class="table-default">
-      <th scope="row">${d.name[i]}</th>
-      <td>${d.user_name[i]}</td>
-      <td>${d.company[i]}</td>
-      <td>${d.contact[i]}</td>
-      <td>No Action</td>
-    </tr>`
+       if(d.id[i] == 0) {
+        supply.innerHTML += `<tr class="table-default">
+        <th scope="row" style="width:30%">${d.name[i]}</th>
+        <td style="width:32.5%">${d.company[i]}</td>
+        <td style="width:18%">${d.contact[i]}</td>
+        <td style="width:23%">
+          no search found
+        </td>
+      </tr>`
+       } else {
+        supply.innerHTML += `<tr class="table-default">
+        <th scope="row" style="width:30%">${d.name[i]}</th>
+        <td style="width:32.5%">${d.company[i]}</td>
+        <td style="width:18%">${d.contact[i]}</td>
+        <td style="width:23%">
+        <i class="fas fa-edit text-danger faa-vertical animated-hover ml-2" onclick="Supplier.EditSupplier(${d.id[i]})"></i>
+        <i class="fas fa-trash-alt faa-wrench animated-hover text-warning ml-2" onclick="Supplier.delSessId(${d.id[i]})" data-toggle="modal" data-target="#del"></i>
+        <i class="fa fa-eye faa-pulse animated-hover text-info ml-2" onclick="Supplier.ShowSupplier(${d.id[i]})"></i>
+        </td>
+      </tr>`
+       }
     }
    });
 
@@ -754,16 +909,30 @@ class Supplier {
     Main.postData('POST','HTTP/GET/supplier/supplierfetch.php',params)
       .then((data)=>{
       let d = JSON.parse(data);
-      // console.log(d);
+      // ////console.log(d);
       const supply = document.querySelector('#supply');
       for(let i = 0; i < d.name.length;i++){
-        supply.innerHTML += `<tr class="table-default">
-        <th scope="row">${d.name[i]}</th>
-        <td>${d.user_name[i]}</td>
-        <td>${d.company[i]}</td>
-        <td>${d.contact[i]}</td>
-        <td>No Action</td>
-      </tr>`
+        if(d.id[i] == 0) {
+          supply.innerHTML += `<tr class="table-default">
+          <th scope="row" style="width:30%">${d.name[i]}</th>
+          <td style="width:32.5%">${d.company[i]}</td>
+          <td style="width:18%">${d.contact[i]}</td>
+          <td style="width:23%">
+            no search found
+          </td>
+        </tr>`
+         } else {
+          supply.innerHTML += `<tr class="table-default">
+          <th scope="row" style="width:30%">${d.name[i]}</th>
+          <td style="width:32.5%">${d.company[i]}</td>
+          <td style="width:18%">${d.contact[i]}</td>
+          <td style="width:23%">
+          <i class="fas fa-edit text-danger faa-vertical animated-hover ml-2" onclick="Supplier.EditSupplier(${d.id[i]})"></i>
+          <i class="fas fa-trash-alt faa-wrench animated-hover text-warning ml-2" onclick="Supplier.delSessId(${d.id[i]})" data-toggle="modal" data-target="#del"></i>
+          <i class="fa fa-eye faa-pulse animated-hover text-info ml-2" onclick="Supplier.ShowSupplier(${d.id[i]})"></i>
+          </td>
+        </tr>`
+         }
       }
 
       if(search == '') {
@@ -799,16 +968,30 @@ class Supplier {
    Main.postData('POST','HTTP/GET/supplier/supplierfetch.php',params)
    .then((data)=>{
      let d = JSON.parse(data);
-     //console.log(d);
+     //////console.log(d);
      const supply = document.querySelector('#supply');
      for(let i = 0; i < d.name.length;i++){
-      supply.innerHTML += `<tr class="table-default">
-      <th scope="row">${d.name[i]}</th>
-      <td>${d.user_name[i]}</td>
-      <td>${d.company[i]}</td>
-      <td>${d.contact[i]}</td>
-      <td>No Action</td>
-    </tr>`
+      if(d.id[i] == 0) {
+        supply.innerHTML += `<tr class="table-default">
+        <th scope="row" style="width:30%">${d.name[i]}</th>
+        <td style="width:32.5%">${d.company[i]}</td>
+        <td style="width:18%">${d.contact[i]}</td>
+        <td style="width:23%">
+          no search found
+        </td>
+      </tr>`
+       } else {
+        supply.innerHTML += `<tr class="table-default">
+        <th scope="row" style="width:30%">${d.name[i]}</th>
+        <td style="width:32.5%">${d.company[i]}</td>
+        <td style="width:18%">${d.contact[i]}</td>
+        <td style="width:23%">
+        <i class="fas fa-edit text-danger faa-vertical animated-hover ml-2" onclick="Supplier.EditSupplier(${d.id[i]})"></i>
+        <i class="fas fa-trash-alt faa-wrench animated-hover text-warning ml-2" onclick="Supplier.delSessId(${d.id[i]})" data-toggle="modal" data-target="#del"></i>
+        <i class="fa fa-eye faa-pulse animated-hover text-info ml-2" onclick="Supplier.ShowSupplier(${d.id[i]})"></i>
+        </td>
+      </tr>`
+       }
     }
 
 
@@ -829,23 +1012,132 @@ class Supplier {
 
  }
 
- // Transaction
- static registerSupplier() {
+ static DelModalSupplier(){
+  del.innerHTML = `
+  <div class="modal-dialog text-warning" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fas fa-exclamation-circle faa-bounce animated fa-md"></i> <b>Delete</b></h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this item ?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-warning" onclick="Supplier.DeleteSupplier()" data-dismiss="modal">Confirm</button>
+        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>`;
+ }
 
+ static DeleteSupplier(){
+  let id = JSON.parse(sessionStorage.getItem('del_id'));
+  let params = ["hid="+id.del];
+  Main.postData('POST','HTTP/DELETE/supplier/supplierdelete.php',params)
+  .then((data)=>{
+    console.log(data);
+    Supplier.fetchSupplier();
+  })
+  .catch((err)=>{
+    console.log(err);
+  })
+ 
+ }
+
+ static ShowSupplier(id){
+  //console.log(id);
+  supplier.innerHTML = '';
+  let params = ["hid="+id];
+  Main.postData('POST','HTTP/GET/supplier/showsupplier.php',params)
+  .then((data)=>{
+   let d = JSON.parse(data);
+   console.log(d);
+   supplier.innerHTML = `<br><br><br>
+   <div class="card text-white bg-dark text-light mb-3" style="max-width: 54rem;">
+   <div class="card-body">
+   <div class="text-info">
+   <h1><b><center>Full Information</center></b></h1>
+   <h4><b>Registrar: </b>${d.user_name}</h4>
+   <h4><b>Supplier Name: </b>${d.first} ${d.last}</h4>
+   <h4><b>Company: </b>${d.company}</h4>
+   <h4><b>Contact: </b>${d.contact}</h4>
+   <h4><b>Created at: </b>${d.created_at}</h4>
+   <h4><b>Updated at: </b>${d.updated_at}</h4>
+   <input type="button" class="form-control btn btn-outline-secondary mt-2" onclick="Supplier.fetchSupplier()" value="Back">
+   </div>
+   </div>
+   </div>`;
+   //Supplier.fetchSupply();
+  })
+  .catch((err)=>{
+    console.log(err);
+  })
+
+ }
+
+ static EditSupplier(id){
+  message.innerHTML = '';
+  supplier.innerHTML = '';
+  let params = ["hid="+id];
+  Main.postData('POST','HTTP/GET/supplier/showsupplier.php',params)
+  .then((data)=>{
+    let d = JSON.parse(data);
+    supplier.innerHTML = `
+    <form id="updateSupplier" class="text-info">
+    <center><h1><b>Add a supplier information</b></h1></center>
+    <div class="form-group">
+    <label for="exampleInputEmail1"><b>First Name</b></label>
+    <input type="text" class="form-control" id="first" name="first" placeholder="Required a maximum of 30 value" value="${d.first}">
+    </div>
+    <div class="form-group">
+    <label for="exampleInputEmail1"><b>Last Name</b></label>
+    <input type="text" class="form-control" id="last" name="last" placeholder="Required a maximum of 30 value" value="${d.last}">
+    </div>
+    <div class="form-group">
+    <label for="exampleInputEmail1"><b>Company Name</b></label>
+    <input type="text" class="form-control" id="company" name="company" placeholder="Required a maximum of 30 value" value="${d.company}">
+    </div>
+    <div class="form-group">
+    <label for="exampleInputEmail1"><b>Contact Number</b></label>
+    <input type="text" class="form-control" id="contact" name="contact" placeholder="eg. 0926214112 exactly 11 value only" value="${d.contact}">
+    </div>
+    <input type="submit" class="mt-2 form-control btn btn-outline-info" name="submit" value="Submit">
+    <input type="button" class="mt-2 form-control btn btn-outline-secondary" onclick="Supplier.fetchSupplier()" value="Back">
+    </form>`;
+
+    const updateSupplier = document.querySelector('#updateSupplier');
+
+    updateSupplier.addEventListener('submit',function(x){
+      x.preventDefault();
+      //console.log('OK');
+      Supplier.UpdateSupplier(id);
+    });
+  }
+  ).catch((err)=>{
+    console.log(err);
+  });
+ }
+
+ static UpdateSupplier(id){
   let first = document.querySelector('#first').value;
   let last = document.querySelector('#last').value;
   let company = document.querySelector('#company').value;
   let contact = document.querySelector('#contact').value;
 
-  let params = ['first=',first,'&last=',last,'&company=',company,'&contact=',contact];
+  let params = ['uid=',id,'&first=',first,'&last=',last,'&company=',company,'&contact=',contact];
   
-  Main.postData('POST','HTTP/POST/supplier/supplierperson.php',params)
-  .then((data)=>{
-   // console.log(data);
+  Main.postData('POST','HTTP/PUT/supplier/updatesupplier.php',params)
+   .then((data)=>{
+   console.log(data);
     if(data == 'success') {
-      supplier.innerHTML = `<center><h1 class="text-success"><b>The supplier person was added</b></h1></center>
-        <input type="button" class="form-control btn btn-outline-secondary mt-2" value="Back to the table">`;
-      // console.log(xhr.responseText);
+      message.innerHTML = '';
+      supplier.innerHTML = `<br><br>
+      <br>
+      <center><h1 class="text-info"><b>The supplier person was updated</b></h1></center>
+        <input type="button" class="form-control btn btn-outline-secondary mt-2" value="Back to the table" onclick="Supplier.fetchSupplier()">`;
       } else if(data == 'empty') {
         message.innerHTML = `<center><h3 class="text-danger"><b>Please fill out all the forms</b></h3></center>`;
       } 
@@ -854,12 +1146,14 @@ class Supplier {
       } else if(data == 'count') {
         message.innerHTML = `<center><h3 class="text-danger"><b>Please follow the requirement of the fields</b></h3></center>`;
       }
-  })
-  .catch((err)=>{
-    console.log(err);
-  });
-
+    })
+    .catch((err)=>{
+      console.log(err);
+    });
  }
+
+
+ // Transaction
 
  static formSupplierTransac() {
   message.innerHTML = '';
@@ -902,12 +1196,12 @@ class Supplier {
 
     SuppTransac.addEventListener('submit',function(x){
       x.preventDefault();
-      Supplier.suppyTransac();
+      Supplier.supplyTransac();
     });
     
  }
 
- static suppyTransac(){
+ static supplyTransac(){
   const supply_name = document.querySelector('#supply_name').value;
   const supply_id = document.querySelector('#supply_id').value;
   const quantity = document.querySelector('#quantity').value;
@@ -943,6 +1237,7 @@ class Supplier {
  static fetchTransac(){
   supplier.innerHTML = '';
   message.innerHTML = '';
+  Supplier.DelModalTransac();
   supplier.innerHTML += `<h1 class="text-info mt-1"><b><center>Transaction Table</center><b></h1>
   <div class="form-inline mb-3 mt-4">
   <form id="searchForm">
@@ -970,8 +1265,6 @@ class Supplier {
   <thead>
     <tr class="table-info">
       <th scope="col">Transac ID</th>
-      <th scope="col">Supplier Name</th>
-      <th scope="col">Registrar</th>
       <th scope="col">Quantity</th>
       <th scope="col">Unit Price</th>
       <th scope="col">Date Issued</th>
@@ -989,17 +1282,33 @@ class Supplier {
    Main.postData('POST','HTTP/GET/supplier/supplierfetchtransac.php',params)
     .then((data)=>{
      let d = JSON.parse(data);
+     console.log(d);
      const supply = document.querySelector('#supply');
      for(let i = 0; i < d.supp_product_id.length;i++){
-      supply.innerHTML += `<tr class="table-default">
-      <th scope="row">${d.supp_product_id[i]}</th>
-      <td>${d.supp_person_name[i]}</td>
-      <td>${d.supp_user_name[i]}</td>
-      <td>${d.quantity[i]}</td>
-      <td>₱ ${d.unit_price[i]}</td>
-      <td>${d.created_at[i]}</td>
-      <td>No Action</td>
+      if(d.id[i] == 0){
+        supply.innerHTML += `<tr class="table-default">
+      <th scope="row" style="width:17.5%">${d.supp_product_id[i]}</th>
+      <td style="width:18.5%">${d.quantity[i]}</td>
+      <td style="width:20%">${d.unit_price[i]}</td>
+      <td style="width:25%">${d.created_at[i]}</td>
+      <td style="width:20%">
+        no search found
+      </td>
     </tr>`
+      } else {
+        supply.innerHTML += `<tr class="table-default">
+      <th scope="row" style="width:17.5%">${d.supp_product_id[i]}</th>
+      <td style="width:18.5%">${d.quantity[i]}</td>
+      <td style="width:20%">${d.unit_price[i]}</td>
+      <td style="width:25%">${d.created_at[i]}</td>
+      <td style="width:20%">
+      <i class="fas fa-edit text-danger faa-vertical animated-hover ml-2" onclick="Supplier.EditTransac(${d.id[i]})"></i>
+      <i class="fas fa-trash-alt faa-wrench animated-hover text-warning ml-2" onclick="Supplier.delSessId(${d.id[i]})" data-toggle="modal" data-target="#del"></i>
+      <i class="fa fa-eye faa-pulse animated-hover text-info ml-2" onclick="Supplier.ShowTransac(${d.id[i]})"></i>
+      </td>
+    </tr>`
+      }
+      
     }
    });
    const searchForm = document.querySelector('#searchForm');
@@ -1018,15 +1327,29 @@ class Supplier {
       let d = JSON.parse(data);
       const supply = document.querySelector('#supply');
       for(let i = 0; i < d.supp_product_id.length;i++){
-       supply.innerHTML += `<tr class="table-default">
-       <th scope="row">${d.supp_product_id[i]}</th>
-       <td>${d.supp_person_name[i]}</td>
-       <td>${d.supp_user_name[i]}</td>
-       <td>${d.quantity[i]}</td>
-       <td>₱ ${d.unit_price[i]}</td>
-       <td>${d.created_at[i]}</td>
-       <td>No Action</td>
-     </tr>`
+        if(d.id[i] == 0){
+          supply.innerHTML += `<tr class="table-default">
+        <th scope="row" style="width:17.5%">${d.supp_product_id[i]}</th>
+        <td style="width:18.5%">${d.quantity[i]}</td>
+        <td style="width:20%">${d.unit_price[i]}</td>
+        <td style="width:25%">${d.created_at[i]}</td>
+        <td style="width:20%">
+          no search found
+        </td>
+      </tr>`
+        } else {
+          supply.innerHTML += `<tr class="table-default">
+        <th scope="row" style="width:17.5%">${d.supp_product_id[i]}</th>
+        <td style="width:18.5%">${d.quantity[i]}</td>
+        <td style="width:20%">${d.unit_price[i]}</td>
+        <td style="width:25%">${d.created_at[i]}</td>
+        <td style="width:20%">
+        <i class="fas fa-edit text-danger faa-vertical animated-hover ml-2" onclick="Supplier.EditTransac(${d.id[i]})"></i>
+        <i class="fas fa-trash-alt faa-wrench animated-hover text-warning ml-2" onclick="Supplier.delSessId(${d.id[i]})" data-toggle="modal" data-target="#del"></i>
+        <i class="fa fa-eye faa-pulse animated-hover text-info ml-2" onclick="Supplier.ShowTransac(${d.id[i]})"></i>
+        </td>
+      </tr>`
+        }
      }
     })
       .catch((err)=>{
@@ -1047,15 +1370,29 @@ class Supplier {
      let d = JSON.parse(data);
      const supply = document.querySelector('#supply');
      for(let i = 0; i < d.supp_product_id.length;i++){
-      supply.innerHTML += `<tr class="table-default">
-      <th scope="row">${d.supp_product_id[i]}</th>
-      <td>${d.supp_person_name[i]}</td>
-      <td>${d.supp_user_name[i]}</td>
-      <td>${d.quantity[i]}</td>
-      <td>₱ ${d.unit_price[i]}</td>
-      <td>${d.created_at[i]}</td>
-      <td>No Action</td>
+      if(d.id[i] == 0){
+        supply.innerHTML += `<tr class="table-default">
+      <th scope="row" style="width:17.5%">${d.supp_product_id[i]}</th>
+      <td style="width:18.5%">${d.quantity[i]}</td>
+      <td style="width:20%">${d.unit_price[i]}</td>
+      <td style="width:25%">${d.created_at[i]}</td>
+      <td style="width:20%">
+        no search found
+      </td>
     </tr>`
+      } else {
+        supply.innerHTML += `<tr class="table-default">
+      <th scope="row" style="width:17.5%">${d.supp_product_id[i]}</th>
+      <td style="width:18.5%">${d.quantity[i]}</td>
+      <td style="width:20%">${d.unit_price[i]}</td>
+      <td style="width:25%">${d.created_at[i]}</td>
+      <td style="width:20%">
+      <i class="fas fa-edit text-danger faa-vertical animated-hover ml-2" onclick="Supplier.EditTransac(${d.id[i]})"></i>
+      <i class="fas fa-trash-alt faa-wrench animated-hover text-warning ml-2" onclick="Supplier.delSessId(${d.id[i]})" data-toggle="modal" data-target="#del"></i>
+      <i class="fa fa-eye faa-pulse animated-hover text-info ml-2" onclick="Supplier.ShowTransac(${d.id[i]})"></i>
+      </td>
+    </tr>`
+      }
     }
    })
    .catch((err)=>{
@@ -1064,10 +1401,162 @@ class Supplier {
   });
  }
 
+ static DelModalTransac(){
+  del.innerHTML = `
+  <div class="modal-dialog text-warning" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fas fa-exclamation-circle faa-bounce animated fa-md"></i> <b>Delete</b></h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this item ?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-warning" onclick="Supplier.DeleteTransac()" data-dismiss="modal">Confirm</button>
+        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>`;
+ }
+
+ static DeleteTransac(){
+  let id = JSON.parse(sessionStorage.getItem('del_id'));
+  let params = ["hid="+id.del];
+  Main.postData('POST','HTTP/DELETE/supplier/transacdelete.php',params)
+  .then((data)=>{
+    console.log(data);
+    Supplier.fetchTransac();
+  })
+  .catch((err)=>{
+    console.log(err);
+  })
  
+ }
+ 
+ static ShowTransac(id){
+  //console.log(id);
+  supplier.innerHTML = '';
+  let params = ["hid="+id];
+  Main.postData('POST','HTTP/GET/supplier/showtransac.php',params)
+  .then((data)=>{
+   let d = JSON.parse(data);
+   console.log(d);
+   supplier.innerHTML = `<br><br><br>
+   <div class="card text-white bg-dark text-light mb-3" style="max-width: 54rem;">
+   <div class="card-body">
+   <div class="text-info">
+   <h1><b><center>Full Information</center></b></h1>
+   <h4><b>Registrar: </b>${d.supp_user_name}</h4>
+   <h4><b>Transaction ID: </b>${d.transac_id}</h4>
+   <h4><b>Supply ID: </b>${d.supp_product_id}</h4>
+   <h4><b>:Supplier Name </b>${d.supp_person_name}</h4>
+   <h4><b>Quantity: </b>${d.quantity}</h4>
+   <h4><b>Unit Price: </b>₱ ${d.unit_price}</h4>
+   <h4><b>Created at: </b>${d.created_at}</h4>
+   <h4><b>Updated at: </b>${d.updated_at}</h4>
+   <input type="button" class="form-control btn btn-outline-secondary mt-2" onclick="Supplier.fetchTransac()" value="Back">
+   </div>
+   </div>
+   </div>`; 
+  })
+  .catch((err)=>{
+    console.log(err);
+  })
+ }
+
+ static EditTransac(id){
+  message.innerHTML = '';
+  supplier.innerHTML = '';
+  let params = ["hid="+id];
+  Main.postData('POST','HTTP/GET/supplier/showtransac.php',params)
+  .then((data)=>{
+    let d = JSON.parse(data);
+    console.log(d);
+    supplier.innerHTML += `<form id="UpdateTransac" class="text-info">
+  <center><h1><b>Edit the transaction</b></h1></center>
+  
+  <div class="form-group">
+  <label for="exampleInputEmail1"><b>Supplier's Name</b></label>
+  <select class="form-control" name="supply_name" id="supply_name">
+  </select>
+  </div>
+
+  <div class="form-group">
+  <label for="exampleInputEmail1"><b>Quantity</b></label>
+  <input type="text" class="form-control" id="quantity" name="quantity" placeholder="Required a maximum of 10 value" value="${d.quantity}">
+  </div>
+
+  <div class="form-group">
+  <label for="exampleInputEmail1"><b>Unit Price</b></label>
+  <input type="text" class="form-control" id="unit_price" name="unit_price" placeholder="Required a maximum of 10 value" value="${d.unit_price}">
+  </div>
+
+  <input type="submit" class="mt-2 form-control btn btn-outline-info" name="submit" value="Submit">
+  <input type="button" class="mt-2 form-control btn btn-outline-secondary" onclick="Supplier.fetchTransac()" value="Back">
+  </form>`;
+
+  Main.getData('GET','HTTP/GET/supplier/suppliernamefetch.php')
+  .then((data)=>{
+   let list = JSON.parse(data);
+   const supply_name = document.querySelector('#supply_name');
+   for(let i = 0;i < list.name.length;i++) {
+     supply_name.innerHTML += `<option value="${list.id[i]}">${list.name[i]}</option>`;
+   }
+   });
+
+
+    const UpdateTransac = document.querySelector('#UpdateTransac');
+
+    UpdateTransac.addEventListener('submit',function(x){
+      x.preventDefault();
+      console.log('OK');
+      Supplier.UpdateTransac(id);
+    });
+  }).catch((err)=>{
+    console.log(err);
+  });
+
+  /*  */
+ }
+
+ static UpdateTransac(id){
+  const supply_name = document.querySelector('#supply_name').value;
+  const quantity = document.querySelector('#quantity').value;
+  const unit_price = document.querySelector('#unit_price').value;
+
+  let params = ['uid=',id,'&supply_name=',supply_name,
+  '&quantity=',quantity,'&unit_price=',unit_price];
+
+  Main.postData('POST','HTTP/PUT/supplier/updatetransac.php',params)
+  .then((data)=>{
+    console.log(data);
+    if(data == 'success') {
+      message.innerHTML = '';
+      supplier.innerHTML = `<center><h1 class="text-info"><b>Transaction was updated</b></h1></center>
+        <input type="button" class="form-control btn btn-outline-secondary mt-2" value="Back to supply transaction table" onclick="Supplier.fetchTransac()">`;
+      // console.log(xhr.responseText);
+      } else if(data == 'empty') {
+        message.innerHTML = `<center><h3 class="text-danger"><b>Please fill out all forms</b></h3></center>`;
+      } 
+      else if(data == 'cannot') {
+        message.innerHTML = `<center><h3 class="text-danger"><b>Some of the field not required to put special characters or not related to field</b></h3></center>`;
+      } else if(data == 'not exist') {
+        message.innerHTML = `<center><h3 class="text-danger"><b>The supply id is invalid</b></h3></center>`;
+      } else if(data == 'count') {
+        message.innerHTML = `<center><h3 class="text-danger"><b>Please follow the requirement of the fields</b></h3></center>`;
+      }
+  })
+  .catch((err)=>{
+    console.log(err);
+  })
+ }
+
 }
 
-
+Todo.MainTodo();
 
 // Button 
 btnTodo.addEventListener('click',function(x){
