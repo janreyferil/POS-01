@@ -10,11 +10,11 @@ if(!isset($_POST['supply_id'])) {
     $supply_id = $_POST['supply_id'];
     $quantity = $_POST['quantity'];
     $unit_price = $_POST['unit_price'];
-    if(empty($supply_id) || empty($quantity) || empty($unit_price)) {
+    if(empty($supply_name) || empty($supply_id) || empty($quantity) || empty($unit_price)) {
         echo 'empty';
         exit();
     } else {
-        if(!preg_match("/[A-Za-z0-9]+/",$supply_id) || !preg_match("/[0-9]+/",$quantity) || !preg_match("/[0-9.]+/",$unit_price)) {
+        if(!preg_match("/[A-Za-z0-9]+$/u",$supply_id) || !preg_match("/[0-9]+$/u",$quantity) || !preg_match("/[0-9.]+$/u",$unit_price)) {
          echo 'cannot';
          exit();
         }  else {

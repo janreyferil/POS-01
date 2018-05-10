@@ -15,7 +15,7 @@ if(!isset($_POST['first'])) {
     if(empty($first) || empty($last) || empty($company) || empty($contact)) {
         echo 'empty';
     } else {
-        if(!preg_match("/[A-Za-z ]+/",$first) || !preg_match("/[A-Za-z ]+/",$last) || !preg_match("/[A-Za-z0-9 ]+/",$company) || !preg_match("/[0-9]+/",$contact)) {
+        if(!preg_match("/[A-Za-z ]+$/u",$first) || !preg_match("/[A-Za-z ]+$/u",$last) || !preg_match("/[A-Za-z0-9 ]+$/u",$company) || !preg_match("/[0-9]+$/u",$contact)) {
          echo 'cannot';
         }  else {
             if(strlen($first) > 30 || strlen($last) > 30 || strlen($company) > 50 || strlen($contact) != 11){

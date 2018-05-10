@@ -10,3 +10,4 @@ require_once 'Tables/logbook.php';
 require_once 'Tables/announcement.php';
 require_once 'Tables/todo.php';
 require_once 'Tables/supplier.php';
+require_once 'Tables/inventory.php';

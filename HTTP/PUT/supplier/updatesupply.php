@@ -14,7 +14,7 @@ if(!isset($_POST['supply_id'])) {
         echo 'empty';
         exit();
     } else {
-        if(!preg_match("/[A-Za-z0-9]+/",$supply_id) || !preg_match("/[A-Za-z0-9 ]+/",$ref_name)) {
+        if(!preg_match("/[A-Za-z0-9]+$/u",$supply_id) || !preg_match("/[A-Za-z0-9 ]+$/u",$ref_name)) {
          echo 'cannot';
          exit();
         }  else {

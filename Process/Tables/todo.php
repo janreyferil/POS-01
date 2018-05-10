@@ -131,7 +131,7 @@ trait Todo
     }   
 
     protected function DeleteTodo($conn,$id) {
-        $sql = "DELETE FROM supplier_supply WHERE id =?;";
+        $sql = "DELETE FROM todo WHERE id =?;";
         $stmt = $conn->stmt_init();
         if(!$stmt->prepare($sql)) {
             die($stmt->error);

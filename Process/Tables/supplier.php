@@ -285,9 +285,9 @@
 
         protected function SupplierPerson($conn,$i,$fn,$ln,$com,$cont) {
           $id = $conn->real_escape_string($i);
-          $first = $conn->real_escape_string($fn);
-          $last = $conn->real_escape_string($ln);
-          $company = $conn->real_escape_string($com);
+          $first = $conn->real_escape_string(ucwords($fn));
+          $last = $conn->real_escape_string(ucwords($ln));
+          $company = $conn->real_escape_string(ucwords($com));
           $contact = $conn->real_escape_string($cont);
 
           $sql = "INSERT INTO supplier_person(user_id,fn,ln,company,contact)
@@ -349,9 +349,9 @@
         }
 
         protected function UpdatedSupplier($conn,$id,$u_id,$f,$l,$com,$con){
-          $first = $conn->real_escape_string(ucfirst($f));
-          $last = $conn->real_escape_string(ucfirst($l));
-          $company = $conn->real_escape_string(ucfirst($com));
+          $first = $conn->real_escape_string(ucwords($f));
+          $last = $conn->real_escape_string(ucwords($l));
+          $company = $conn->real_escape_string(ucwords($com));
           $contact = $conn->real_escape_string($con);
           $updated_at = $conn->real_escape_string(date('Y-m-d H:i:s'));
           $sql = "UPDATE supplier_person 
@@ -719,18 +719,30 @@
                   exit();
                 }
               }
-            }                
-              $stmt->bind_param('iiidsi',$supplier_id,$u_id,$quantity,$unit_price,$updated_at,$id);
+            } 
+            $convert = $this->normalizeDecimal($unit_price);
+           $stmt->bind_param('iiidsi',$supplier_id,$u_id,$quantity,$convert,$updated_at,$id);
               if(!$stmt->execute()){
                 die($stmt->errror);
                 exit();
               }else {
                 echo 'success';
                 exit();
-              }
+              } 
+          }
           }
         }
-      }
+
+        private function normalizeDecimal($val, int $precision = 2): string {
+          $input = str_replace(' ', '', $val);
+          $number = str_replace(',', '.', $input);
+          if (strpos($number, '.')) {
+              $groups = explode('.', str_replace(',', '.', $number));
+              $lastGroup = array_pop($groups);
+              $number = implode('', $groups) . '.' . $lastGroup;
+          }
+          return bcadd($number, 0, $precision);
+        }
 
  }
 

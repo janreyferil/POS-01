@@ -9,7 +9,7 @@
     <li class="nav-item active text-white ">
     <i id="btnTodo" class="fas fa-clipboard-list fa-2x ml-5 mt-2 faa-wrench animated-hover"></i>
     <br>
-      <small class="ml-5 noselect"><b>Todo</b></small>
+      <small class="ml-5 noselect"><b>To-do</b></small>
      </li>
       <li class="nav-item active text-primary">
       <i id="btnSupplier" class="fas fa-truck fa-2x mt-2 ml-5 faa-horizontal animated-hover"></i>
@@ -18,7 +18,7 @@
       </li>
 
       <li class="nav-item active text-warning">
-      <i class="fas fa-box-open fa-2x mt-2 ml-5 faa-pulse animated-hover"></i>
+      <i  id="btnInventory" class="fas fa-box-open fa-2x mt-2 ml-5 faa-pulse animated-hover"></i>
       <br>
       <small class="ml-5"><b>Inventory</b></small>
       </li>

@@ -10,6 +10,10 @@ const btnTodo = document.querySelector('#btnTodo');
 let bolSupplier = true;
 const btnSupplier = document.querySelector('#btnSupplier');
 
+// Inventory
+let bolInventory = true;
+const btnInventory = document.querySelector('#btnInventory');
+
 class Main {
    static getData(method,url){
     return new Promise((resolve,reject) => {
@@ -80,13 +84,13 @@ class Todo {
     const todo = document.querySelector('#todo');
     const del = document.querySelector('#del');
 
-    mainElement.innerHTML = `<div class="card text-white border-success mb-3" style="max-width: 54rem;">
-    <div class="card-header">
-    <i class="float-right mt-3 ml-4 fas text-warning fa-times-circle fa-2x " onclick="Main.closeAll()"></i>
+    mainElement.innerHTML = `<div class="card text-white border-light mb-3" style="max-width: 54rem;">
+    <div class="card-header bg-light-opacity">
+    <i class="float-right mt-3 ml-4 fas text-dark fa-times-circle fa-2x " onclick="Main.closeAll()"></i>
     <i id="create" class="float-right text-primary ml-4 mt-3 fa fa-pencil-alt fa-2x " onclick="Todo.Create()"></i>
     <i id="show" class="float-right text-info mt-3 fas fa-eye faa-fast fa-2x" onclick="Todo.Show()"></i>
-    <h1><b> To-Do List</b></h1>
-    <small class="float-right text-warning mr-1 ml-3"><b>Close</b></small>
+    <h1 class="text-dark"><b> To-Do List</b></h1>
+    <small class="float-right text-dark mr-1 ml-3"><b>Close</b></small>
     <small class="float-right text-primary mr-4 ml-3"><b>Write</b></small>
     <small class="float-right text-info mr-3"><b>Show</b></small>
     </div>
@@ -97,9 +101,10 @@ class Todo {
     </div>`;
   
     Todo.Show();
-  }
+   }
 
-  static fetchTodo() {
+  
+   static fetchTodo() {
     Todo.DelModal();
     Main.getData('GET','HTTP/GET/todo/todofetch.php')
     .then((data)=> {
@@ -112,7 +117,7 @@ class Todo {
       } 
       for(let i = 0; i < d.id.length; i++) {
             output += `
-            <div class="card text-white bg-dark text-light mb-3" style="max-width: 54rem;">
+            <div class="card text-white bg-dark text-light mt-2 mb-2" style="max-width: 54rem;">
             <div class="card-body">
             <i class="fas fa-trash-alt faa-wrench animated-hover text-warning float-right mr-4" onclick = "Todo.delGet(${d.id[i]})" data-toggle="modal" data-target="#del"></i>
               <small><b>Written On ${d.created_at[i]}</b></small>
@@ -128,20 +133,21 @@ class Todo {
     .catch((err)=>{
         console.log(err);
     });
-  }
+   }
 
-  static createTodo() {
+  
+   static createTodo() {
     let b = document.querySelector('#body').value;
     let params = ['body=',b];
     Main.postData('POST','HTTP/POST/todo/createtodo.php',params)
     .then((data)=>{
       if(data == 'success') {
-        todo.innerHTML = `<center><h1><b>Todo was added</b></h1></center>
-          <input type="button" class="form-control btn btn-outline-secondary mt-2" onclick="Todo.Show()" value="Back to the todo">`;
+        todo.innerHTML = `<center><h1><b>To-do was added</b></h1></center>
+          <input type="button" class="col-12 btn btn-outline-secondary mt-2" onclick="Todo.Show()" value="Back to the todo">`;
         // console.log(xhr.responseText);
         } else if(data == 'empty') {
           todo.innerHTML = `<center><h1><b>Please compose a todo</b></h1></center>
-          <input type="button" class="form-control btn btn-outline-secondary mt-2" onclick="Todo.formTodo()" value="Back to the create form">`;
+          <input type="button" class="col-12 btn btn-outline-secondary mt-2" onclick="Todo.formTodo()" value="Back to the create form">`;
         } 
     })
     .catch((err)=>{
@@ -152,12 +158,12 @@ class Todo {
   static formTodo(){
     todo.innerHTML = `
     <form id="cTodo" class="text-light">
-    <center><h1><b>Add Todo</b></h1></center>
+    <center><h1><b>Add To-do</b></h1></center>
     <div class="form-group">
     <label for="exampleInputEmail1"><b>Body</b></label>
     <textarea class="form-control" id="body" name="body"></textarea>
     </div>
-    <input type="submit" class="form-control btn btn-outline-light" name="submit" value="Add">
+    <input type="submit" class="col-12 btn btn-outline-light" name="submit" value="Add">
     </form>`;
 
     
@@ -197,7 +203,7 @@ class Todo {
         sessionStorage.setItem('del_id',JSON.stringify(d));
       } else {
         let data = JSON.parse(sessionStorage.getItem('del_id'))
-      //  console.log(data.del);
+         console.log(data.del);
         data.del = id;
         sessionStorage.setItem('del_id',JSON.stringify(data));
       }
@@ -252,20 +258,20 @@ class Supplier {
   const stock = document.querySelector('#stock');
   const fetchs = document.querySelector('#fetchs');
 
-  mainElement.innerHTML = `<div class="card text-white border-success mb-3" style="max-width: 54rem;">
-  <div class="card-header">
-  <i class="float-right mt-3 ml-4 fas text-warning fa-times-circle fa-2x " onclick="Main.closeAll()"></i>
+  mainElement.innerHTML = `<div class="card border-primary mb-3" style="max-width: 54rem;">
+  <div class="card-header bg-primary-opacity">
+  <i class="float-right mt-3 ml-4 fas text-dark fa-times-circle fa-2x " onclick="Main.closeAll()"></i>
   <i  id="fetchs" class="float-right mt-3 ml-4 fas text-info fas fas fa-table faa-fast fa-2x" onclick="Supplier.FetchingSupply()"></></i>
   <i id="create" class="float-right mt-3 ml-4 fas text-success fas fa-people-carry fa-2x" onclick="Supplier.RegisterPerson()"></i>
-  <i id="stock" class="float-right mt-3 ml-4 fas text-primary fas fa-truck-loading fa-2x" onclick="Supplier.RegisterStock()"></i>
-  <h1><b> Supplier Section</b></h1>
-  <small class="float-right text-warning mr-2 ml-4"><b>Close</b></small>
+  <i id="stock" class="float-right mt-3 ml-4 fas text-light fas fa-truck-loading fa-2x" onclick="Supplier.RegisterStock()"></i>
+  <h1 class="text-dark"><b> Supplier Section</b></h1>
+  <small class="float-right text-dark mr-2 ml-4"><b>Close</b></small>
   <small class="float-right text-info mr-2 ml-2"><b>Table</b></small>
   <small class="float-right text-success mr-3 ml-3"><b>Supplier</b></small>
-  <small class="float-right text-primary mr-3"><b>Stock</b></small>
+  <small class="float-right text-light mr-3"><b>Stock</b></small>
   </div>
 
-  <div class="card-body">
+  <div class="card-body text-info">
   <div id="message" class="mb-2"></div>
   <div class="mb-1 mt-1" id="options"></div>
   <div id="supplier"></div>
@@ -294,12 +300,12 @@ class Supplier {
    supplier.innerHTML = '';
    message.innerHTML = '';
    Supplier.formSupplierSupply();
-   options.innerHTML =  `   <div onclick="Supplier.formSupplierSupply()" class="float-left form-inline text-primary">
-   <button class="btn btn-outline-primary mr-2"><i class="fas fa-cubes"> Add Supply</i></h5></button>
+   options.innerHTML =  `   <div onclick="Supplier.formSupplierSupply()" class="float-left form-inline text-light">
+   <button class="btn btn-outline-light mr-2"><i class="fas fa-cubes"> Add Supply</i></h5></button>
    </div>
   
-   <div onclick="Supplier.formSupplierTransac()" class="float-left form-inline text-primary">
-   <button class="btn btn-outline-primary mr-2"><i class="fas fa-hand-holding-usd"> Transaction</i></button>
+   <div onclick="Supplier.formSupplierTransac()" class="float-left form-inline text-light">
+   <button class="btn btn-outline-light mr-2"><i class="fas fa-hand-holding-usd"> Transaction</i></button>
    </div>`;
    stock.classList.add('faa-bounce')
    stock.classList.add('animated');
@@ -356,18 +362,18 @@ class Supplier {
 
     if(data == 'success') {
       message.innerHTML = '';
-      supplier.innerHTML = `<center><h1 class="text-primary"><b>The supply was added</b></h1></center>
-        <input type="button" class="form-control btn btn-outline-secondary mt-2" value="Back to Supply ID" onclick="Supplier.formSupplierSupply()">`;
+      supplier.innerHTML = `<center><h1 class="text-light"><b>The supply was added</b></h1></center>
+        <input type="button" class="col-12 btn btn-outline-secondary mt-2" value="Back to Supply ID" onclick="Supplier.formSupplierSupply()">`;
       // console.log(xhr.responseText);
       } else if(data == 'empty') {
         message.innerHTML = `<center><h3 class="text-danger"><b>Please fill out all the forms</b></h3></center>`;
       } 
       else if(data == 'cannot') {
-        message.innerHTML = `<center><h3 class="text-danger"><b>Please do not include any letters</b></h3></center>`;
+        message.innerHTML = `<center><h3 class="text-danger"><b>Do not include any inappropriate characters</b></h3></center>`;
       } else if(data == 'taken') {
-        message.innerHTML = `<center><h3 class="text-danger"><b>Please put unique a supply id</b></h3></center>`;
+        message.innerHTML = `<center><h3 class="text-danger"><b>The value was taken</b></h3></center>`;
       } else if(data == 'count') {
-        message.innerHTML = `<center><h3 class="text-danger"><b>Please follow the requirement of the fields</b></h3></center>`;
+        message.innerHTML = `<center><h3 class="text-danger"><b>Please follow the requirement of the field</b></h3></center>`;
       }
   })
   .catch((err)=>{
@@ -380,7 +386,7 @@ class Supplier {
   message.innerHTML = '';
   supplier.innerHTML = '';
   supplier.innerHTML = `
-  <form id="SuppSupply" class="text-primary">
+  <form id="SuppSupply" class="text-light">
   <center><h1><b>Add new supply ID</b></h1></center>
   <div class="form-group">
   <label for="exampleInputEmail1"><b>Supply ID</b></label>
@@ -390,7 +396,7 @@ class Supplier {
   <label for="exampleInputEmail1"><b>Reference Name</b></label>
   <input type="text" class="form-control" id="ref_name" name="ref_name" placeholder="Required a maximun of 25 value">
   </div>
-  <input type="submit" class="form-control btn btn-outline-primary" name="submit" value="Submit">
+  <input type="submit" class="col-12 btn btn-outline-light" name="submit" value="Submit">
   </form>`;
   const SuppSupply = document.querySelector('#SuppSupply');
 
@@ -670,7 +676,7 @@ class Supplier {
     <h4><b>Stock: </b>${d.stock}</h4>
     <h4><b>Created at: </b>${d.created_at}</h4>
     <h4><b>Updated at: </b>${d.updated_at}</h4>
-    <input type="button" class="form-control btn btn-outline-secondary mt-2" onclick="Supplier.fetchSupply()" value="Back">
+    <input type="button" class="col-12 btn btn-outline-secondary mt-2" onclick="Supplier.fetchSupply()" value="Back">
     </div>
     </div>
     </div>`;
@@ -704,8 +710,8 @@ class Supplier {
     <label for="exampleInputEmail1"><b>Reference Name</b></label>
     <input type="text" class="form-control" id="ref_name" name="ref_name" placeholder="Required a maximun of 25 value" value="${d.ref_name}">
     </div>
-    <input type="submit" class="mt-2 form-control btn btn-outline-info" name="submit" value="Submit">
-    <input type="button" class="mt-2 form-control btn btn-outline-secondary" onclick="Supplier.fetchSupply()" value="Back">
+    <input type="submit" class="mt-2 col-12 btn btn-outline-info" name="submit" value="Submit">
+    <input type="button" class="mt-2 col-12 btn btn-outline-secondary" onclick="Supplier.fetchSupply()" value="Back">
     </form>
     </div>
     </div>`;
@@ -737,7 +743,7 @@ class Supplier {
       message.innerHTML = '';
       supplier.innerHTML = `<br><br><br>
         <center><h1 class="text-info"><b>The supply was updated</b></h1></center>
-        <input type="button" class="form-control btn btn-outline-secondary mt-2" value="Back to Supply ID" onclick="Supplier.fetchSupply()">`;
+        <input type="button" class="col-12 btn btn-outline-secondary mt-2" value="Back to Supply ID" onclick="Supplier.fetchSupply()">`;
       // console.log(xhr.responseText);
       } else if(data == 'empty') {
         message.innerHTML = `<center><h3 class="text-danger"><b>Please fill out all the forms</b></h3></center>`;
@@ -778,7 +784,7 @@ class Supplier {
       <label for="exampleInputEmail1"><b>Contact Number</b></label>
       <input type="text" class="form-control" id="contact" name="contact" placeholder="eg. 0926214112 exactly 11 value only">
       </div>
-      <input type="submit" class="form-control btn btn-outline-success" name="submit" value="Submit">
+      <input type="submit" class="col-12 btn btn-outline-success" name="submit" value="Submit">
       </form>`;
 
       const cSupplier = document.querySelector('#cSupplier');
@@ -803,15 +809,17 @@ class Supplier {
    // console.log(data);
     if(data == 'success') {
       supplier.innerHTML = `<center><h1 class="text-success"><b>The supplier person was added</b></h1></center>
-        <input type="button" class="form-control btn btn-outline-secondary mt-2" value="Back to the table">`;
+        <input type="button" class="col-12 btn btn-outline-secondary mt-2" value="Back to the table" onclick="Supplier.fetchSupplier()">`;
       // console.log(xhr.responseText);
       } else if(data == 'empty') {
         message.innerHTML = `<center><h3 class="text-danger"><b>Please fill out all the forms</b></h3></center>`;
       } 
       else if(data == 'cannot') {
-        message.innerHTML = `<center><h3 class="text-danger"><b>Please do not include any special character or not required character in specific form</b></h3></center>`;
+        message.innerHTML = `<center><h3 class="text-danger"><b>Do not include any inappropriate characters</b></h3></center>`;
+      } else if(data == 'taken') {
+        message.innerHTML = `<center><h3 class="text-danger"><b>The value was taken</b></h3></center>`;
       } else if(data == 'count') {
-        message.innerHTML = `<center><h3 class="text-danger"><b>Please follow the requirement of the fields</b></h3></center>`;
+        message.innerHTML = `<center><h3 class="text-danger"><b>Please follow the requirement of the field</b></h3></center>`;
       }
   })
   .catch((err)=>{
@@ -1066,7 +1074,7 @@ class Supplier {
    <h4><b>Contact: </b>${d.contact}</h4>
    <h4><b>Created at: </b>${d.created_at}</h4>
    <h4><b>Updated at: </b>${d.updated_at}</h4>
-   <input type="button" class="form-control btn btn-outline-secondary mt-2" onclick="Supplier.fetchSupplier()" value="Back">
+   <input type="button" class="col-12 btn btn-outline-secondary mt-2" onclick="Supplier.fetchSupplier()" value="Back">
    </div>
    </div>
    </div>`;
@@ -1104,8 +1112,8 @@ class Supplier {
     <label for="exampleInputEmail1"><b>Contact Number</b></label>
     <input type="text" class="form-control" id="contact" name="contact" placeholder="eg. 0926214112 exactly 11 value only" value="${d.contact}">
     </div>
-    <input type="submit" class="mt-2 form-control btn btn-outline-info" name="submit" value="Submit">
-    <input type="button" class="mt-2 form-control btn btn-outline-secondary" onclick="Supplier.fetchSupplier()" value="Back">
+    <input type="submit" class="mt-2 col-12 btn btn-outline-info" name="submit" value="Submit">
+    <input type="button" class="mt-2 col-12 btn btn-outline-secondary" onclick="Supplier.fetchSupplier()" value="Back">
     </form>`;
 
     const updateSupplier = document.querySelector('#updateSupplier');
@@ -1137,7 +1145,7 @@ class Supplier {
       supplier.innerHTML = `<br><br>
       <br>
       <center><h1 class="text-info"><b>The supplier person was updated</b></h1></center>
-        <input type="button" class="form-control btn btn-outline-secondary mt-2" value="Back to the table" onclick="Supplier.fetchSupplier()">`;
+        <input type="button" class="col-12 btn btn-outline-secondary mt-2" value="Back to the table" onclick="Supplier.fetchSupplier()">`;
       } else if(data == 'empty') {
         message.innerHTML = `<center><h3 class="text-danger"><b>Please fill out all the forms</b></h3></center>`;
       } 
@@ -1158,7 +1166,7 @@ class Supplier {
  static formSupplierTransac() {
   message.innerHTML = '';
   supplier.innerHTML = '';
-  supplier.innerHTML += `<form id="SuppTransac" class="text-primary">
+  supplier.innerHTML += `<form id="SuppTransac" class="text-light">
   <center><h1><b>Supplier Transaction</b></h1></center>
   <div class="form-group">
   <label for="exampleInputEmail1"><b>Supplier's Name</b></label>
@@ -1180,7 +1188,7 @@ class Supplier {
   <input type="text" class="form-control" id="unit_price" name="unit_price" placeholder="Required a maximum of 10 value">
   </div>
 
-  <input type="submit" class="form-control btn btn-outline-primary" name="submit" value="Submit">
+  <input type="submit" class="col-12 btn btn-outline-light" name="submit" value="Submit">
   </form>`;
 
   Main.getData('GET','HTTP/GET/supplier/suppliernamefetch.php')
@@ -1215,18 +1223,18 @@ class Supplier {
     console.log(data);
     if(data == 'success') {
       message.innerHTML = '';
-      supplier.innerHTML = `<center><h1 class="text-info"><b>Transaction was finished</b></h1></center>
-        <input type="button" class="form-control btn btn-outline-secondary mt-2" value="Back to Supply ID" onclick="Supplier.formSupplierSupply()">`;
+      supplier.innerHTML = `<center><h1 class="text-light"><b>Transaction was finished</b></h1></center>
+        <input type="button" class="col-12 btn btn-outline-secondary mt-2" value="Back to Supply ID" onclick="Supplier.formSupplierSupply()">`;
       // console.log(xhr.responseText);
       } else if(data == 'empty') {
-        message.innerHTML = `<center><h3 class="text-danger"><b>Please fill out all forms</b></h3></center>`;
+        message.innerHTML = `<center><h3 class="text-danger"><b>Please fill out all the forms</b></h3></center>`;
       } 
       else if(data == 'cannot') {
-        message.innerHTML = `<center><h3 class="text-danger"><b>Some of the field not required to put special characters or not related to field</b></h3></center>`;
-      } else if(data == 'not exist') {
-        message.innerHTML = `<center><h3 class="text-danger"><b>The supply id is invalid</b></h3></center>`;
+        message.innerHTML = `<center><h3 class="text-danger"><b>Do not include any inappropriate characters</b></h3></center>`;
+      } else if(data == 'taken') {
+        message.innerHTML = `<center><h3 class="text-danger"><b>The value was taken</b></h3></center>`;
       } else if(data == 'count') {
-        message.innerHTML = `<center><h3 class="text-danger"><b>Please follow the requirement of the fields</b></h3></center>`;
+        message.innerHTML = `<center><h3 class="text-danger"><b>Please follow the requirement of the field</b></h3></center>`;
       }
   })
   .catch((err)=>{
@@ -1452,12 +1460,12 @@ class Supplier {
    <h4><b>Registrar: </b>${d.supp_user_name}</h4>
    <h4><b>Transaction ID: </b>${d.transac_id}</h4>
    <h4><b>Supply ID: </b>${d.supp_product_id}</h4>
-   <h4><b>:Supplier Name </b>${d.supp_person_name}</h4>
+   <h4><b>Supplier Name </b>${d.supp_person_name}</h4>
    <h4><b>Quantity: </b>${d.quantity}</h4>
    <h4><b>Unit Price: </b>₱ ${d.unit_price}</h4>
    <h4><b>Created at: </b>${d.created_at}</h4>
    <h4><b>Updated at: </b>${d.updated_at}</h4>
-   <input type="button" class="form-control btn btn-outline-secondary mt-2" onclick="Supplier.fetchTransac()" value="Back">
+   <input type="button" class="col-12 btn btn-outline-secondary mt-2" onclick="Supplier.fetchTransac()" value="Back">
    </div>
    </div>
    </div>`; 
@@ -1475,8 +1483,9 @@ class Supplier {
   .then((data)=>{
     let d = JSON.parse(data);
     console.log(d);
+    console.log(d.unit_price);
     supplier.innerHTML += `<form id="UpdateTransac" class="text-info">
-  <center><h1><b>Edit the transaction</b></h1></center>
+  <center><h1><b>Edit Section</b></h1></center>
   
   <div class="form-group">
   <label for="exampleInputEmail1"><b>Supplier's Name</b></label>
@@ -1494,8 +1503,8 @@ class Supplier {
   <input type="text" class="form-control" id="unit_price" name="unit_price" placeholder="Required a maximum of 10 value" value="${d.unit_price}">
   </div>
 
-  <input type="submit" class="mt-2 form-control btn btn-outline-info" name="submit" value="Submit">
-  <input type="button" class="mt-2 form-control btn btn-outline-secondary" onclick="Supplier.fetchTransac()" value="Back">
+  <input type="submit" class="mt-2 col-12 btn btn-outline-info" name="submit" value="Submit">
+  <input type="button" class="mt-2 col-12 btn btn-outline-secondary" onclick="Supplier.fetchTransac()" value="Back">
   </form>`;
 
   Main.getData('GET','HTTP/GET/supplier/suppliernamefetch.php')
@@ -1529,14 +1538,14 @@ class Supplier {
 
   let params = ['uid=',id,'&supply_name=',supply_name,
   '&quantity=',quantity,'&unit_price=',unit_price];
-
+  console.log(unit_price);
   Main.postData('POST','HTTP/PUT/supplier/updatetransac.php',params)
   .then((data)=>{
     console.log(data);
     if(data == 'success') {
       message.innerHTML = '';
       supplier.innerHTML = `<center><h1 class="text-info"><b>Transaction was updated</b></h1></center>
-        <input type="button" class="form-control btn btn-outline-secondary mt-2" value="Back to supply transaction table" onclick="Supplier.fetchTransac()">`;
+        <input type="button" class="col-12 btn btn-outline-secondary mt-2" value="Back to supply transaction table" onclick="Supplier.fetchTransac()">`;
       // console.log(xhr.responseText);
       } else if(data == 'empty') {
         message.innerHTML = `<center><h3 class="text-danger"><b>Please fill out all forms</b></h3></center>`;
@@ -1556,7 +1565,108 @@ class Supplier {
 
 }
 
-Todo.MainTodo();
+class Inventory {
+  static MainInventory() {
+    mainElement.innerHTML = `<div class="card border-warning mb-3" style="max-width: 54rem;">
+    <div class="card-header bg-warning-opacity">
+    <i class="float-right mt-3 ml-4 fas text-dark fa-times-circle fa-2x " onclick="Main.closeAll()"></i>
+    <i  id="fetchs" class="float-right mt-3 ml-4 fas text-success fas fas fa-table faa-fast fa-2x" onclick="Supplier.FetchingSupply()"></></i>
+    <i id="create" class="float-right mt-3 ml-4 fas text-info fas fa-th-list fa-2x" onclick="Supplier.RegisterPerson()"></i>
+    <i id="stock" class="float-right mt-3 ml-4 fas text-primary fas fa-cube fa-2x" onclick="Inventory.RegisterInventory()"></i>
+    <h1 class="text-dark"><b> Inventory Section</b></h1>
+    <small class="float-right text-dark mr-2 ml-4"><b>Close</b></small>
+    <small class="float-right text-success mr-2 ml-1"><b>Table</b></small>
+    <small class="float-right text-info mr-3"><b>Category</b></small>
+    <small class="float-right text-primary mr-3"><b>Inventory</b></small>
+    </div>
+
+    <div class="card-body text-light">
+    <div id="message" class="mb-2"></div>
+    <div class="mb-1 mt-1" id="options"></div>
+    <div id="supplier"></div>
+    </div>
+    </div>`;
+  }
+
+  static RegisterInventory() {
+    options.innerHTML = '';
+    supplier.innerHTML = '';
+    message.innerHTML = '';
+    Inventory.formCategory();
+    options.innerHTML =  `<div onclick="Inventory.formCategory()" class="float-left form-inline">
+    <button class="btn btn-outline-primary mr-2"><i class="fab fa-cuttlefish"> Add Category</i></h5></button>
+    </div>
+   
+    <div onclick="Supplier.formSupplierTransac()" class="float-left form-inline">
+    <button class="btn btn-outline-primary mr-2"><i class="fas fa-box"> Add Inventory</i></button>
+    </div>`;
+    stock.classList.add('faa-bounce')
+    stock.classList.add('animated');
+ 
+    create.classList.remove('faa-horizontal');
+    create.classList.remove('animated');
+ 
+    fetchs.classList.remove('faa-pulse');
+    fetchs.classList.remove('animated');
+  
+  }
+
+  // Category 
+  static formCategory(){
+    message.innerHTML = '';
+    supplier.innerHTML = '';
+    supplier.innerHTML = `
+    <form id="createCategory" class="text-primary">
+    <center><h1><b>Add new category</b></h1></center>
+    
+    <div class="form-group">
+    <label for="exampleInputEmail1"><b>Category Name</b></label>
+    <input type="text" class="form-control" id="category_name" name="category_name" placeholder="Required a maximun of 25 value">
+    </div>
+    <input type="submit" class="col-12 btn btn-outline-primary" name="submit" value="Submit">
+    </form>`;
+    const createCategory = document.querySelector('#createCategory');
+
+    createCategory.addEventListener('submit',function(x){
+      x.preventDefault();
+      console.log('Ok');
+      Inventory.createCategory();
+    });
+  }
+
+  static createCategory(){
+      let category_name = document.querySelector('#category_name').value;
+      let params = ['category_name=',category_name];
+      Main.postData('POST','HTTP/POST/inventory/category.php',params)
+      .then((data)=>{
+        if(data == 'success') {
+          message.innerHTML = '';
+          supplier.innerHTML = `<center><h1 class="text-primary"><b>New category was added</b></h1></center>
+            <input type="button" class="col-12 btn btn-outline-secondary mt-2" value="Back to Supply ID" onclick="Inventory.formCategory()">`;
+          
+          } else if(data == 'empty') {
+            message.innerHTML = `<center><h3 class="text-danger"><b>Please fill out all the forms</b></h3></center>`;
+          } 
+          else if(data == 'cannot') {
+            message.innerHTML = `<center><h3 class="text-danger"><b>Do not include any inappropriate characters</b></h3></center>`;
+          } else if(data == 'taken') {
+            message.innerHTML = `<center><h3 class="text-danger"><b>The value was taken</b></h3></center>`;
+          } else if(data == 'count') {
+            message.innerHTML = `<center><h3 class="text-danger"><b>Please follow the requirement of the field</b></h3></center>`;
+          }
+      })
+      .catch((err)=>{
+        console.log(err);
+      })
+  }
+
+  //Inventory
+  
+}
+
+
+
+
 
 // Button 
 btnTodo.addEventListener('click',function(x){
@@ -1565,6 +1675,7 @@ btnTodo.addEventListener('click',function(x){
     Todo.MainTodo();
     bolTodo = false;
     bolSupplier = true;
+    bolInventory = true;
   } else {
     mainElement.innerHTML = '';
     bolTodo = true;
@@ -1578,9 +1689,23 @@ btnSupplier.addEventListener('click',function(x){
     Supplier.MainSupplier();
     bolSupplier = false;
     bolTodo = true;
+    bolInventory = true;
   } else {
     mainElement.innerHTML = '';
     bolSupplier = true;
+  }
+})
+
+btnInventory.addEventListener('click',function(x){
+  x.preventDefault();
+  if(bolInventory) {
+    Inventory.MainInventory();
+    bolInventory = false;
+    bolSupplier = true;
+    bolTodo = true;
+  } else {
+    mainElement.innerHTML = '';
+    bolInventory = true;
   }
 })
 

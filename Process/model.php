@@ -9,6 +9,7 @@ class Model extends Database {
     use Announcement;
     use Todo;
     use Supplier;
+    use Inventory;
  
 
     public function __construct() {
@@ -257,7 +258,15 @@ class SupplierModel extends Model {
     }
 }
 
-$new = new SupplierModel();
+class InventoryModel extends Model {
+    public function modelCreateCategory($name){
+        $conn = $this->connection();
+        $this->CreateCategory($conn,$name);
+    }
+}
+
+$new = new InventoryModel();
+//$new->modelCreateCategory('fresh meat');
 //$new->modelUpdateTransaction(1,2,600,5000);
 //$new->modelShowSupplier(2);
 //$new->modelUpdatedSupply('28','12345','Milo');

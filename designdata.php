@@ -60,8 +60,8 @@
         suppplier_transac
         id
         transac_id
-        supp_user_id    -- user
-        supp_product_id -- supplier_product
+        supp_user_id    -- user table
+        supp_product_id -- supply table
         quantity
         unit_price
         created_at
@@ -74,8 +74,8 @@
 
         inventory_product
         inventory_id
-        supp_product_id
-        inventory_category_id
+        supp_product_id -- supply table
+        inventory_category_id -- category table
         code
         name
         price

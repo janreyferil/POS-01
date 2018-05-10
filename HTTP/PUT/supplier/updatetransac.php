@@ -14,7 +14,7 @@ if(!isset($_POST['quantity'])) {
         echo 'empty';
         exit();
     } else {
-        if(!preg_match("/[0-9]+/",$quantity) || !preg_match("/[0-9.]+/",$unit_price)) {
+        if(!preg_match("/[0-9]+$/u",$quantity) || !preg_match("/[0-9.]+$/u",$unit_price)) {
          echo 'cannot';
          exit();
         }  else {
