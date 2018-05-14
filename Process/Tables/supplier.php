@@ -200,6 +200,20 @@
 
         }
 
+        protected function SearchSupply($conn,$s){
+          $sql ="SELECT * FROM supplier_supply WHERE ref_name LIKE '$s%' GROUP BY ref_name ASC LIMIT 1;";   
+          $result = $conn->query($sql);
+          if($result->num_rows > 0){
+            if($row = $result->fetch_assoc()){
+              $supply_id = $row['supply_id'];
+            }
+            $data = array("supply_id"=>$supply_id);
+          } else {
+            $data = array("supply_id"=>'');
+          }  
+          echo json_encode($data);
+        }
+        
         //Supplier
         protected function FetchSupplier($conn,$s,$l,$o){
           if($l == ''){
@@ -601,6 +615,10 @@
                 $data = array("id"=>$id,
                   "name"=>$name);
                 echo json_encode($data);
+                exit();
+              } else {
+                echo 'none';
+                exit();
               }
             }
           }

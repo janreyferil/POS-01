@@ -1,25 +1,27 @@
 <?php
 
-if(!isset($_POST['category_name'])) {
+if(!isset($_POST['stock'])) {
     header('Location: ../../../');
     exit(); 
 } else {
     require_once '../../../Process/model.php';
-    $category = $_POST['category_name'];
-    if(empty($category)) {
+    $supply_id = $_POST['getSupply'];
+    $stock = $_POST['stock'];
+    $operator = $_POST['operator'];
+    if(empty($stock) || empty($supply_id)) {
         echo 'empty';
         exit();
     } else {
-        if(!preg_match('/^[a-zA-Z ]+$/u',$category)) {
+        if(!preg_match('/^[0-9]+$/u',$stock)) {
          echo 'cannot';
          exit();
         }  else {
-            if(strlen($category) > 25) {
+            if(strlen($stock) > 10) {
                 echo 'count';
                 exit();
             } else {
                 $data = new InventoryModel();
-                $data->modelCreateCategory($category);
+                $data->modelInventoryStock($supply_id,$operator,$stock);
             }
         }
     }

@@ -50,10 +50,16 @@
             <br>
             <input type="hidden" id="username" value="'.$username.'">
             
-            <div id="setting"></div>
-            <div id="mainElement"></div>
-            <div id="showSupplier"></div>
-            
+            <div class="row">
+                <div class="col-10">
+                    <div id="mainElement"></div>
+                    <div id="showSupplier"></div>
+                </div>
+                <div class="col-2">
+                    <div id="setting"></div>
+                </div>
+            </div>
+       
              <div class="modal fade" id="del">
              </div>';
             echo '<script src="JS/timer.js"></script>';

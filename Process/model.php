@@ -206,6 +206,11 @@ class SupplierModel extends Model {
         $conn = $this->connection();
         $this->FetchTransaction($conn,$search,$limit,$order);
     }
+    
+    public function modelSearchSupply($search){
+        $conn = $this->connection();
+        $this->SearchSupply($conn,$search);
+    }
 
     // Delete Data
     public function modelDeleteSupply($id){
@@ -263,9 +268,37 @@ class InventoryModel extends Model {
         $conn = $this->connection();
         $this->CreateCategory($conn,$name);
     }
+
+    public function modelGetSupply($status){
+        $conn = $this->connection();
+        $this->getSupply($conn,$status);
+    }
+
+    public function modelGetCategory(){
+        $conn = $this->connection();
+        $this->GetCategory($conn);
+    }
+
+    public function modelCreateInventory($supply_id,$category_id,$code,$name,$description,$price,$stock){
+        $conn = $this->connection();
+        $id = $_SESSION['u_id'];
+        $this->CreateInventory($conn,$id,$supply_id,$category_id,$code,$name,$description,$price,$stock);
+    }
+
+    public function modelInventoryStock($supply_id,$operator,$stock){
+        $conn = $this->connection();
+        $this->InventoryStock($conn,$supply_id,$operator,$stock);
+    }
 }
 
 $new = new InventoryModel();
+//$new->modelInventoryStock('QW133','decrease',100);
+//$ge = new SupplierModel();
+//$ge->modelSearchSupply('c');
+
+//$new->modelCreateInventory('N2131',2,'ABCDE','Milo','Chocolaty and sweety','7.50','700');
+//$new->modelGetCategory();
+//$new->modelGetSupply('assigned');
 //$new->modelCreateCategory('fresh meat');
 //$new->modelUpdateTransaction(1,2,600,5000);
 //$new->modelShowSupplier(2);

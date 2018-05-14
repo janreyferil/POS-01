@@ -19,7 +19,7 @@ function UserSetting(setting) {
     .then(data => {
       let parseData = JSON.parse(data);
       let val = document.querySelector('#username').value;
-      let output = `<div class="card border-success mb-3 float-right" style="max-width: 15rem;">
+      let output = `<div class="card border-success mb-3 text-center" style="max-width: 15rem;">
       <div class="card-header text-success"><h5><b>Account Setting</b></h5></div>
       <div class="card-body text-success">
       <form action="HTTP/POST/users/setting.php" method="POST">
