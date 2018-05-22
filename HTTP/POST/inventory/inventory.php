@@ -18,7 +18,7 @@ if(!isset($_POST['supply_id'])) {
         echo 'empty';
         exit();
     } else {
-        if(!preg_match('/^[a-zA-Z0-9]+$/u',$code) || !preg_match('/^[a-zA-Z0-9 ]+$/u',$name) || !preg_match('/^[a-zA-Z0-9 ]+$/u',$description) || 
+        if(!preg_match('/^[a-zA-Z0-9]+$/u',$code) || !preg_match('/^[a-zA-Z0-9 ]+$/u',$name) || 
         !preg_match('/^[0-9.]+$/u',$price) || !preg_match('/^[0-9]+$/u',$stock)) {
          echo 'cannot';
          exit();

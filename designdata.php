@@ -82,6 +82,13 @@
         created_at
         updated_at
 
+        inventory_discount
+        discount_id
+        product_code
+        discount
+        vat
+        discount_updated_at
+
 
 
 

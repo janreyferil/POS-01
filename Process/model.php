@@ -289,14 +289,62 @@ class InventoryModel extends Model {
         $conn = $this->connection();
         $this->InventoryStock($conn,$supply_id,$operator,$stock);
     }
+
+    public function modelGetInventory($search){
+        $conn = $this->connection();
+        $this->GetInventory($conn,$search);
+    }
+
+    public function modelUpdateDiscount($id,$vat,$discount,$vatable,$discountable){
+        $conn = $this->connection();
+        $this->UpdateDiscount($conn,$id,$vat,$discount,$vatable,$discountable);
+    }
+
+    public function modelFetchInventory($search,$limit,$order){
+        $conn = $this->connection();
+        $http = 'post';
+        $this->FetchInventory($conn,$search,$limit,$order,$http);
+    }
+
+    public function modelShowInventory(){
+        $conn = $this->connection();
+        $http = 'get';
+        $this->FetchInventory($conn,'','','',$http);
+        
+    }
+
+    public function modelDeleteInventory($id){
+        $conn = $this->connection();
+        $this->DeleteInventory($conn,$id);
+    }
+
+    public function modelUpdateInventory($id,$category,$code,$name,$description,$price){
+        $conn = $this->connection();
+        $this->UpdateInventory($conn,$id,$category,$code,$name,$description,$price);
+    }
+
+    public function modelDeleteCategory($id){
+        $conn = $this->connection();
+        $this->DeleteCategory($conn,$id);
+    }
+
+    public function modelUpdateCategory($id,$category){
+        $conn = $this->connection();
+        $this->UpdateCategory($conn,$id,$category);
+    }
 }
 
 $new = new InventoryModel();
+
+//$new->modelDeleteCategory(2);
+//$new->modelFetchInventory('Vita','','ASC');
+//$new->modelUpdateInventory(1,3,'Vita Vita','Dead food');
+//$new->modelFetchInventory();
+//$new->modelGetInventory('Coca');
 //$new->modelInventoryStock('QW133','decrease',100);
 //$ge = new SupplierModel();
 //$ge->modelSearchSupply('c');
-
-//$new->modelCreateInventory('N2131',2,'ABCDE','Milo','Chocolaty and sweety','7.50','700');
+//$new->modelCreateInventory('112AS',3,'3ds21','Mocha Cake','Chocolaty and sweety','5.0','0');
 //$new->modelGetCategory();
 //$new->modelGetSupply('assigned');
 //$new->modelCreateCategory('fresh meat');

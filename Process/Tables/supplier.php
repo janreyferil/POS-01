@@ -206,10 +206,13 @@
           if($result->num_rows > 0){
             if($row = $result->fetch_assoc()){
               $supply_id = $row['supply_id'];
+              $ref_name = $row['ref_name'];
             }
-            $data = array("supply_id"=>$supply_id);
+            $data = array("supply_id"=>$supply_id,
+            "name"=>$ref_name);
           } else {
-            $data = array("supply_id"=>'');
+            $data = array("supply_id"=>'',
+            "name"=>'');
           }  
           echo json_encode($data);
         }

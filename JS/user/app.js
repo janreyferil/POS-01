@@ -449,17 +449,17 @@ class Supplier {
   <form id="searchForm">
      <div class="form-group">
        <div class="text-light input-group-addon bg"><i id="lighten1" class="text-info fas fa-search"></i></div>
-       <input class="form-control border-info" type="text" autocomplete="off" name="search" id="search">
+       <input class="form-control form-control-info bg-dark text-info" type="text" autocomplete="off" name="search" id="search">
 
        <div class="text-light input-group-addon bg ml-2"><i id="lighten2" class="text-info fas fa-database"></i></div>
-       <input class="form-control border-info" type="text" autocomplete="off" name="val" id="val">
+       <input class="form-control form-control-info bg-dark text-info" type="text" autocomplete="off" name="val" id="val">
        </div>
        </form>
 
    <form id="orderForm">
    <div class="form-group">
        <div class="text-light input-group-addon ml-2"><i id="lighten3" class="text-info fas fa-sort"></i></div>
-       <select class="form-control" id="order" name="order">
+       <select class="form-control  form-control-info bg-dark text-info" id="order" name="order">
        <option value="ASC">ASCENDING ORDER</option>
        <option value="DESC">DESCENDING ORDER</option>
        </select>
@@ -693,22 +693,24 @@ class Supplier {
 
  static ShowSupply(id){
    //console.log(id);
-  body.innerHTML = '';
+   body.innerHTML = '';
+  options.innerHTML = '';
+  message.innerHTML = '';
+  title.innerHTML = `<b>Transaction Table</b>`;
   let params = ["hid="+id];
   Main.postData('POST','HTTP/GET/supplier/suppliershowsupply.php',params)
   .then((data)=>{
     let d = JSON.parse(data);
     //////console.log(d));
-    body.innerHTML = `<br><br><br>
+    body.innerHTML = `
     <div class="text-info">
-    <h1><b><center>Full Information</center></b></h1>
     <h4><b>Supply ID: </b>${d.supply_id}</h4>
     <h4><b>Name: </b>${d.ref_name}</h4>
     <h4><b>Status: </b>${d.status}</h4>
     <h4><b>Stock: </b>${d.stock}</h4>
     <h4><b>Created at: </b>${d.created_at}</h4>
     <h4><b>Updated at: </b>${d.updated_at}</h4>
-    <input type="button" class="col-12 btn btn-outline-secondary mt-2" onclick="Supplier.fetchSupply()" value="Back">
+    <input type="button" class="col-12 btn btn-outline-secondary mt-2" onclick="Supplier.FetchingSupply()" value="Back">
     </div>`;
     //Supplier.fetchSupply();
   })
@@ -882,17 +884,17 @@ class Supplier {
   <form id="searchForm">
      <div class="form-group">
        <div class="text-light input-group-addon bg"><i id="lighten1" class="text-info fas fa-search"></i></div>
-       <input class="form-control border-info" type="text" autocomplete="off" name="search" id="search">
+       <input class="form-control form-control-info bg-dark text-info" type="text" autocomplete="off" name="search" id="search">
 
        <div class="text-light input-group-addon bg ml-2"><i id="lighten2" class="text-info fas fa-database"></i></div>
-       <input class="form-control border-info" type="text" autocomplete="off" name="val" id="val">
+       <input class="form-control form-control-info bg-dark text-info" type="text" autocomplete="off" name="val" id="val">
        </div>
        </form>
 
    <form id="orderForm">
    <div class="form-group">
        <div class="text-light input-group-addon ml-2"><i id="lighten3" class="text-info fas fa-sort"></i></div>
-       <select class="form-control" id="order" name="order">
+       <select class="form-control  form-control-info bg-dark text-info" id="order" name="order">
        <option value="ASC">ASCENDING ORDER</option>
        <option value="DESC">DESCENDING ORDER</option>
        </select>
@@ -1103,21 +1105,23 @@ class Supplier {
  static ShowSupplier(id){
   //console.log(id);
   body.innerHTML = '';
+  options.innerHTML = '';
+  message.innerHTML = '';
+  title.innerHTML = `<b>Transaction Table</b>`;
   let params = ["hid="+id];
   Main.postData('POST','HTTP/GET/supplier/showsupplier.php',params)
   .then((data)=>{
    let d = JSON.parse(data);
    ////console.log(d));
-   body.innerHTML = `<br><br><br>
+   body.innerHTML = `
    <div class="text-info">
-   <h1><b><center>Full Information</center></b></h1>
    <h4><b>Registrar: </b>${d.user_name}</h4>
    <h4><b>Supplier Name: </b>${d.first} ${d.last}</h4>
    <h4><b>Company: </b>${d.company}</h4>
    <h4><b>Contact: </b>${d.contact}</h4>
    <h4><b>Created at: </b>${d.created_at}</h4>
    <h4><b>Updated at: </b>${d.updated_at}</h4>
-   <input type="button" class="col-12 btn btn-outline-secondary mt-2" onclick="Supplier.fetchSupplier()" value="Back">
+   <input type="button" class="col-12 btn btn-outline-secondary mt-2" onclick="Supplier.FetchingSupply()" value="Back">
    </div>`;
    //Supplier.fetchSupply();
   })
@@ -1216,6 +1220,12 @@ class Supplier {
   </div>
   </form>`;
   body.innerHTML += `
+
+  <div class="form-group">
+  <label for="exampleInputEmail1"><b>Reference name</b></label>
+  <h5 class="text-light" id="ref_name"></h5>
+  </div>
+
   <form id="SuppTransac" class="text-light">
 
   <div class="form-group">
@@ -1248,7 +1258,7 @@ class Supplier {
       body.innerHTML = '';
        body.innerHTML = `<br><br>
        <center><h1 class="text-danger"><b>Please add a supplier first to use the transaction section</b></h1></center>
-      <input type="button" class="col-12 btn btn-outline-secondary mt-2" value="Redirect to supplier section" onclick="Supplier.formSupplierPerson()">`;
+      <input type="button" class="col-12 btn btn-outline-danger mt-2" value="Redirect to supplier section" onclick="Supplier.formSupplierPerson()">`;
 
     } else {
       let list = JSON.parse(data);
@@ -1271,9 +1281,11 @@ class Supplier {
     searchSupply.addEventListener('keyup',function(x){
       x.preventDefault();
       const supply_id = document.querySelector('#supply_id');
+      const ref_name = document.querySelector('#ref_name');
       const search = document.querySelector('#search').value;
       if(search == ''){
         supply_id.value = '';
+        ref_name.innerHTML = '';
         return false;
       }
 
@@ -1283,6 +1295,7 @@ class Supplier {
         let d = JSON.parse(data);
         //console.log(d).supply_id);
         supply_id.value = d.supply_id;
+        ref_name.innerHTML = d.name;
       });
     });
 
@@ -1331,83 +1344,126 @@ class Supplier {
   body.innerHTML += `<br><br>
   <div class="form-inline mb-3 mt-4">
   <form id="searchForm">
-     <div class="form-group">
-       <div class="input-group-addon bg"><i id="lighten1" class="text-info fas fa-search"></i></div>
-       <input class="form-control border-info" type="text" autocomplete="off" name="search" id="search">
+  <div class="form-group">
+    <div class="text-light input-group-addon bg"><i id="lighten1" class="text-info fas fa-search"></i></div>
+    <input class="form-control form-control-info bg-dark text-info" type="text" autocomplete="off" name="search" id="search">
 
-       <div class="input-group-addon bg ml-2"><i id="lighten2" class="text-info fas fa-database"></i></div>
-       <input class="form-control border-info" type="text" autocomplete="off" name="val" id="val">
-       </div>
-       </form>
+    <div class="text-light input-group-addon bg ml-2"><i id="lighten2" class="text-info fas fa-database"></i></div>
+    <input class="form-control form-control-info bg-dark text-info" type="text" autocomplete="off" name="val" id="val">
+    </div>
+    </form>
 
-   <form id="orderForm">
-   <div class="form-group">
-       <div class="text-light input-group-addon ml-2"><i id="lighten3" class="text-info fas fa-sort"></i></div>
-       <select class="form-control" id="order" name="order">
-       <option value="DESC">DESCENDING ORDER</option>
-       <option value="ASC">ASCENDING ORDER</option>
-       </select>
-   </div>
-   </form>
+  <form id="orderForm">
+  <div class="form-group">
+      <div class="text-light input-group-addon ml-2"><i id="lighten3" class="text-info fas fa-sort"></i></div>
+      <select class="form-control  form-control-info bg-dark text-info" id="order" name="order">
+      <option value="ASC">ASCENDING ORDER</option>
+      <option value="DESC">DESCENDING ORDER</option>
+      </select>
   </div>
+  </form>
+    </div>
 
-  <table class="table table-hover border-info">
-  <thead>
-    <tr class="table-info">
-      <th scope="col">Transac ID</th>
-      <th scope="col">Quantity</th>
-      <th scope="col">Unit Price</th>
-      <th scope="col">Date Issued</th>
-      <th scope="col">Action</th>
-    </tr>
-  </thead>
-  <tbody id="supply"></tbody>
-  </table>`;
+    <table class="table table-hover border-info">
+    <thead>
+      <tr class="table-info">
+        <th scope="col">Transac ID</th>
+        <th scope="col">Quantity</th>
+        <th scope="col">Unit Price</th>
+        <th scope="col">Date Issued</th>
+        <th scope="col">Action</th>
+      </tr>
+    </thead>
+    <tbody id="supply"></tbody>
+    </table>`;
 
-  const search = document.querySelector('#search').value; 
-  const val = document.querySelector('#val').value;
-  const order = document.querySelector('#order').value;
-  const params = ['search=',search,'&val=',val,'&order=',order]; 
+    const search = document.querySelector('#search').value; 
+    const val = document.querySelector('#val').value;
+    const order = document.querySelector('#order').value;
+    const params = ['search=',search,'&val=',val,'&order=',order]; 
 
-   Main.postData('POST','HTTP/GET/supplier/supplierfetchtransac.php',params)
-    .then((data)=>{
-     let d = JSON.parse(data);
-     ////console.log(d));
-     const supply = document.querySelector('#supply');
-     for(let i = 0; i < d.supp_product_id.length;i++){
-      if(d.id[i] == 0){
-        supply.innerHTML += `<tr class="table-default">
+    Main.postData('POST','HTTP/GET/supplier/supplierfetchtransac.php',params)
+      .then((data)=>{
+      let d = JSON.parse(data);
+      ////console.log(d));
+      const supply = document.querySelector('#supply');
+      for(let i = 0; i < d.supp_product_id.length;i++){
+        if(d.id[i] == 0){
+          supply.innerHTML += `<tr class="table-default">
+          <th scope="row" style="width:17.5%">${d.supp_product_id[i]}</th>
+          <td style="width:18.5%">${d.quantity[i]}</td>
+          <td style="width:20%">${d.unit_price[i]}</td>
+          <td style="width:22.5%">${d.created_at[i]}</td>
+          <td style="width:22.5%">
+          no search found
+        </td>
+      </tr>`
+        } else {
+          supply.innerHTML += `<tr class="table-default">
         <th scope="row" style="width:17.5%">${d.supp_product_id[i]}</th>
         <td style="width:18.5%">${d.quantity[i]}</td>
         <td style="width:20%">${d.unit_price[i]}</td>
         <td style="width:22.5%">${d.created_at[i]}</td>
         <td style="width:22.5%">
-        no search found
-      </td>
-    </tr>`
-      } else {
-        supply.innerHTML += `<tr class="table-default">
-      <th scope="row" style="width:17.5%">${d.supp_product_id[i]}</th>
-      <td style="width:18.5%">${d.quantity[i]}</td>
-      <td style="width:20%">${d.unit_price[i]}</td>
-      <td style="width:22.5%">${d.created_at[i]}</td>
-      <td style="width:22.5%">
-      <i class="fas fa-edit text-danger faa-vertical animated-hover ml-2" onclick="Supplier.EditTransac(${d.id[i]})"></i>
-      <i class="fas fa-trash-alt faa-wrench animated-hover text-warning ml-2" onclick="Supplier.delSessId(${d.id[i]})" data-toggle="modal" data-target="#del"></i>
-      <i class="fa fa-eye faa-pulse animated-hover text-info ml-2" onclick="Supplier.ShowTransac(${d.id[i]})"></i>
-      </td>
-    </tr>`
+        <i class="fas fa-edit text-danger faa-vertical animated-hover ml-2" onclick="Supplier.EditTransac(${d.id[i]})"></i>
+        <i class="fas fa-trash-alt faa-wrench animated-hover text-warning ml-2" onclick="Supplier.delSessId(${d.id[i]})" data-toggle="modal" data-target="#del"></i>
+        <i class="fa fa-eye faa-pulse animated-hover text-info ml-2" onclick="Supplier.ShowTransac(${d.id[i]})"></i>
+        </td>
+      </tr>`
+        }
+        
       }
-      
-    }
-   });
-   const searchForm = document.querySelector('#searchForm');
-   const orderForm = document.querySelector('#orderForm');
+    });
+    const searchForm = document.querySelector('#searchForm');
+    const orderForm = document.querySelector('#orderForm');
 
-  searchForm.addEventListener('keyup',(x)=>{
+    searchForm.addEventListener('keyup',(x)=>{
+      x.preventDefault();
+      supply.innerHTML = '';
+      console.log('response');
+      const search = document.querySelector('#search').value; 
+      const val = document.querySelector('#val').value;
+      const order = document.querySelector('#order').value;
+      const params = ['search=',search,'&val=',val,'&order=',order]; 
+      Main.postData('POST','HTTP/GET/supplier/supplierfetchtransac.php',params)
+      .then((data)=>{
+        let d = JSON.parse(data);
+        const supply = document.querySelector('#supply');
+        for(let i = 0; i < d.supp_product_id.length;i++){
+          if(d.id[i] == 0){
+            supply.innerHTML += `<tr class="table-default">
+            <th scope="row" style="width:17.5%">${d.supp_product_id[i]}</th>
+            <td style="width:18.5%">${d.quantity[i]}</td>
+            <td style="width:20%">${d.unit_price[i]}</td>
+            <td style="width:22.5%">${d.created_at[i]}</td>
+            <td style="width:22.5%">
+            no search found
+          </td>
+        </tr>`
+          } else {
+            supply.innerHTML += `<tr class="table-default">
+            <th scope="row" style="width:17.5%">${d.supp_product_id[i]}</th>
+            <td style="width:18.5%">${d.quantity[i]}</td>
+            <td style="width:20%">${d.unit_price[i]}</td>
+            <td style="width:22.5%">${d.created_at[i]}</td>
+            <td style="width:22.5%">
+          <i class="fas fa-edit text-danger faa-vertical animated-hover ml-2" onclick="Supplier.EditTransac(${d.id[i]})"></i>
+          <i class="fas fa-trash-alt faa-wrench animated-hover text-warning ml-2" onclick="Supplier.delSessId(${d.id[i]})" data-toggle="modal" data-target="#del"></i>
+          <i class="fa fa-eye faa-pulse animated-hover text-info ml-2" onclick="Supplier.ShowTransac(${d.id[i]})"></i>
+          </td>
+        </tr>`
+          }
+      }
+      })
+        .catch((err)=>{
+        console.log(err);
+        });
+    });
+
+    orderForm.addEventListener('change',(x)=>{
     x.preventDefault();
     supply.innerHTML = '';
-    console.log('response');
+    
     const search = document.querySelector('#search').value; 
     const val = document.querySelector('#val').value;
     const order = document.querySelector('#order').value;
@@ -1439,49 +1495,6 @@ class Supplier {
         <i class="fa fa-eye faa-pulse animated-hover text-info ml-2" onclick="Supplier.ShowTransac(${d.id[i]})"></i>
         </td>
       </tr>`
-        }
-     }
-    })
-      .catch((err)=>{
-      console.log(err);
-       });
-  });
-
-  orderForm.addEventListener('change',(x)=>{
-   x.preventDefault();
-   supply.innerHTML = '';
-  
-   const search = document.querySelector('#search').value; 
-   const val = document.querySelector('#val').value;
-   const order = document.querySelector('#order').value;
-   const params = ['search=',search,'&val=',val,'&order=',order]; 
-   Main.postData('POST','HTTP/GET/supplier/supplierfetchtransac.php',params)
-   .then((data)=>{
-     let d = JSON.parse(data);
-     const supply = document.querySelector('#supply');
-     for(let i = 0; i < d.supp_product_id.length;i++){
-      if(d.id[i] == 0){
-        supply.innerHTML += `<tr class="table-default">
-        <th scope="row" style="width:17.5%">${d.supp_product_id[i]}</th>
-        <td style="width:18.5%">${d.quantity[i]}</td>
-        <td style="width:20%">${d.unit_price[i]}</td>
-        <td style="width:22.5%">${d.created_at[i]}</td>
-        <td style="width:22.5%">
-        no search found
-      </td>
-    </tr>`
-      } else {
-        supply.innerHTML += `<tr class="table-default">
-        <th scope="row" style="width:17.5%">${d.supp_product_id[i]}</th>
-        <td style="width:18.5%">${d.quantity[i]}</td>
-        <td style="width:20%">${d.unit_price[i]}</td>
-        <td style="width:22.5%">${d.created_at[i]}</td>
-        <td style="width:22.5%">
-      <i class="fas fa-edit text-danger faa-vertical animated-hover ml-2" onclick="Supplier.EditTransac(${d.id[i]})"></i>
-      <i class="fas fa-trash-alt faa-wrench animated-hover text-warning ml-2" onclick="Supplier.delSessId(${d.id[i]})" data-toggle="modal" data-target="#del"></i>
-      <i class="fa fa-eye faa-pulse animated-hover text-info ml-2" onclick="Supplier.ShowTransac(${d.id[i]})"></i>
-      </td>
-    </tr>`
       }
     }
    })
@@ -1529,14 +1542,15 @@ class Supplier {
  static ShowTransac(id){
   //console.log(id);
   body.innerHTML = '';
+  options.innerHTML = '';
+  title.innerHTML = `<b>Information Section</b>`;
   let params = ["hid="+id];
   Main.postData('POST','HTTP/GET/supplier/showtransac.php',params)
   .then((data)=>{
    let d = JSON.parse(data);
    ////console.log(d));
-   body.innerHTML = `<br><br><br>
+   body.innerHTML = `
    <div class="text-info">
-   <h1><b><center>Full Information</center></b></h1>
    <h4><b>Registrar: </b>${d.supp_user_name}</h4>
    <h4><b>Transaction ID: </b>${d.transac_id}</h4>
    <h4><b>Supply ID: </b>${d.supp_product_id}</h4>
@@ -1545,7 +1559,7 @@ class Supplier {
    <h4><b>Unit Price: </b>₱ ${d.unit_price}</h4>
    <h4><b>Created at: </b>${d.created_at}</h4>
    <h4><b>Updated at: </b>${d.updated_at}</h4>
-   <input type="button" class="col-12 btn btn-outline-secondary mt-2" onclick="Supplier.fetchTransac()" value="Back">
+   <input type="button" class="col-12 btn btn-outline-secondary mt-2" onclick="Supplier.FetchingSupply()" value="Back">
    </div>`; 
   })
   .catch((err)=>{
@@ -1657,13 +1671,15 @@ class Inventory {
     mainElement.innerHTML = `<div class="card border-warning mb-3" style="max-width: 54rem;">
     <div class="card-header bg-warning-opacity">
     <i class="float-right mt-3 ml-4 fas text-dark fa-times-circle fa-2x " onclick="Main.closeAll()"></i>
-    <i  id="fetchs" class="float-right mt-3 ml-4 fas text-success fas fas fa-table faa-fast fa-2x" onclick="Supplier.FetchingSupply()"></></i>
-    <i id="category" class="float-right mt-3 ml-4 fas text-info fas fa-th-list fa-2x" onclick="Inventory.BtnCategory()"></i>
-    <i id="inventory" class="float-right mt-3 ml-4 fas text-primary fas fa-cube fa-2x" onclick="Inventory.BtnInventory()"></i>
+    <i id="fetchs" class="float-right mt-3 ml-4 text-success fas fas fa-table faa-fast fa-2x" onclick="Inventory.BtnFetch()"></></i>
+    <i id="category" class="float-right mt-3 ml-4 text-info fas fa-th-list fa-2x" onclick="Inventory.BtnCategory()"></i>
+    <i id="percent" class="float-right mt-3 ml-4 text-light fas fa-percent fa-2x" onclick="Inventory.BtnDiscount()"></i>
+    <i id="inventory" class="float-right mt-3 ml-4 text-primary fas fa-cube fa-2x" onclick="Inventory.BtnInventory()"></i>
     <h1 id="title" class="text-dark"><b> Inventory Section</b></h1>
     <small class="float-right text-dark mr-2 ml-4"><b>Close</b></small>
     <small class="float-right text-success mr-2 ml-1"><b>Table</b></small>
     <small class="float-right text-info mr-3"><b>Category</b></small>
+    <small class="float-right text-light mr-3"><b>Discount</b></small>
     <small class="float-right text-primary mr-3"><b>Inventory</b></small>
     </div>
 
@@ -1677,6 +1693,7 @@ class Inventory {
     </div>
     </div>
     </div>`;
+    Inventory.fetchInventory();
   }
 
   static BtnCategory() {
@@ -1693,6 +1710,9 @@ class Inventory {
  
     fetchs.classList.remove('faa-pulse');
     fetchs.classList.remove('animated');
+
+    percent.classList.remove('faa-flash');
+    percent.classList.remove('animated');
   }
 
   static BtnInventory() {
@@ -1717,7 +1737,48 @@ class Inventory {
  
     fetchs.classList.remove('faa-pulse');
     fetchs.classList.remove('animated');
+
+    percent.classList.remove('faa-flash');
+    percent.classList.remove('animated');
   
+  }
+
+  static BtnDiscount(){
+    options.innerHTML = '';
+    body.innerHTML = '';
+    message.innerHTML = '';
+    Inventory.formDiscount();
+    
+    percent.classList.add('faa-flash');
+    percent.classList.add('animated');
+
+    inventory.classList.remove('faa-bounce')
+    inventory.classList.remove('animated');
+ 
+    category.classList.remove('faa-horizontal');
+    category.classList.remove('animated');
+ 
+    fetchs.classList.remove('faa-pulse');
+    fetchs.classList.remove('animated');
+  }
+
+  static BtnFetch(){
+    options.innerHTML = '';
+    body.innerHTML = '';
+    message.innerHTML = '';
+    Inventory.fetchInventory();
+    
+    percent.classList.remove('faa-flash');
+    percent.classList.remove('animated');
+
+    inventory.classList.remove('faa-bounce')
+    inventory.classList.remove('animated');
+ 
+    category.classList.remove('faa-horizontal');
+    category.classList.remove('animated');
+ 
+    fetchs.classList.add('faa-pulse');
+    fetchs.classList.add('animated');
   }
 
 
@@ -1727,20 +1788,127 @@ class Inventory {
     body.innerHTML = '';
     title.innerHTML = `<b>Add Category</b>`;
     body.innerHTML = `
+    <div class="row">
+    <div class="col">
     <form id="createCategory" class="text-info">
     <div class="form-group">
     <label for="exampleInputEmail1"><b>Category Name</b></label>
     <input type="text" autocomplete="off" class="form-control form-control-info text-info bg-dark" id="category_name" name="category_name" placeholder="Required a maximun of 25 value">
     </div>
     <input type="submit" class="col-12 btn btn-outline-info" name="submit" value="Submit">
-    </form>`;
+    </form>
+    </div>
+    <div class="col">
+    <div class="form-group text-info">
+    <label for="exampleInputEmail1"><b>Category Options</b></label>
+    <select class="bg-dark text-info form-control form-control-info" id="takeCategory" name="takeCategory">
+    </select>
+    </div>
+
+    <form id="editCategory">
+    <div class="form-group text-info">
+    <label for="exampleInputEmail1"><b>Get Category</b></label>
+    <input type="text" autocomplete="off" class="form-control form-control-info text-info bg-dark" id="get_category" name="get_category" placeholder="Required a maximun of 25 value">
+    </div>
+
+    <input type="submit" class="col-12 btn btn-outline-info" name="edit" value="Edit">    
+
+    </form>
+
+    <form id="deleteCategory">
+    <input type="submit" class="col-12 btn btn-outline-danger mt-2" name="delete" value="Delete">
+    </form>
+
+    </div>
+    </div>`;
     const createCategory = document.querySelector('#createCategory');
+    const takeCategory = document.querySelector('#takeCategory');
+    const get_category = document.querySelector('#get_category');
+
+    const deleteCategory = document.querySelector('#deleteCategory');
+    const editCategory =document.querySelector('#editCategory');
+
+    deleteCategory.addEventListener('submit',(x)=>{
+      x.preventDefault();
+      let params = ['hid=',takeCategory.value];
+      Main.postData('POST','HTTP/DELETE/inventory/deletecat.php',params)
+      .then((data)=>{
+        console.log(data);
+        if(data == 'success'){
+          message.innerHTML = '';
+          body.innerHTML = `<center><h1 class="text-info"><b>Deleted was successful</b></h1></center>
+            <input type="button" class="col-12 btn btn-outline-secondary mt-2" value="Back to Supply ID" onclick="Inventory.formCategory()">`;
+        }
+        else if(data == 'exist'){
+          message.innerHTML = `<center><h3 class="text-danger"><b>Make sure that the category is not involve to product data</b></h3></center>`;
+        } 
+      })
+    });
+
+    editCategory.addEventListener('submit',(x)=>{
+      x.preventDefault();
+      let params = ['hid=',takeCategory.value,'&get_category=',get_category.value];
+      Main.postData('POST','HTTP/PUT/inventory/updatecat.php',params)
+      .then((data)=>{
+        console.log(data);
+        if(data == 'success') {
+          message.innerHTML = '';
+          body.innerHTML = `<center><h1 class="text-info"><b>New category was added</b></h1></center>
+            <input type="button" class="col-12 btn btn-outline-secondary mt-2" value="Back to Supply ID" onclick="Inventory.formCategory()">`;
+          
+          } else if(data == 'empty') {
+            message.innerHTML = `<center><h3 class="text-danger"><b>Please fill out all the forms</b></h3></center>`;
+          } 
+          else if(data == 'cannot') {
+            message.innerHTML = `<center><h3 class="text-danger"><b>Do not include any inappropriate characters</b></h3></center>`;
+          } else if(data == 'taken') {
+            message.innerHTML = `<center><h3 class="text-danger"><b>The value was taken</b></h3></center>`;
+          } else if(data == 'count') {
+            message.innerHTML = `<center><h3 class="text-danger"><b>Please follow the requirement of the field</b></h3></center>`;
+          }
+        })
+    });
 
     createCategory.addEventListener('submit',function(x){
       x.preventDefault();
       console.log('Ok');
       Inventory.createCategory();
     });
+
+    takeCategory.addEventListener('change',(x)=>{
+      x.preventDefault();
+
+      Main.getData('GET','HTTP/GET/inventory/getcategory.php')
+      .then((data)=>{
+        get_category.value = '';
+        let d = JSON.parse(data);
+      
+        let i = d.category_id.indexOf(takeCategory.value);
+        get_category.value = d.category_name[i];
+      }).catch((err)=>{
+        console.log(err);
+      });
+
+    });
+
+   
+    Main.getData('GET','HTTP/GET/inventory/getcategory.php')
+    .then((data)=>{
+      takeCategory.innerHTML = '';
+      let d = JSON.parse(data);
+      if(d.category_id.length == 1){
+        get_category.value = d.category_name[0];
+      } 
+      for(let i = 0; i < d.category_id.length;i++){
+        takeCategory.innerHTML += `<option value="${d.category_id[i]}">${d.category_name[i]}</option>`;
+      }
+      //////console.log(d));
+    }).catch((err)=>{
+      console.log(err);
+    });
+
+
+
   }
 
   static createCategory(){
@@ -1844,13 +2012,13 @@ class Inventory {
       Main.getData('GET','HTTP/GET/inventory/getsupplynotassigned.php')
       .then((data)=>{
         let d = JSON.parse(data);
-        //console.log(d).id);
+       // console.log(d);
         if(d.id == 0){
           btnSub.disabled = true;
-          message.innerHTML = `<center><h1 class="text-warning"><b>
+          message.innerHTML = `<center><h1 class="text-danger"><b>
           Add supply id in supply section that not assigned in the inventory
           </b></h1></center>
-          <input type="button" class="btn btn-outline-warning col-12 mt-2" onclick="Main.RedirectSupply()" value="redirect to supply section">`;
+          <input type="button" class="btn btn-outline-danger col-12 mt-2" onclick="Main.RedirectSupply()" value="redirect to supply section">`;
         } else {
           //////console.log(d));
           const getSupply = document.querySelector('#getSupply');
@@ -1907,7 +2075,7 @@ class Inventory {
 
       inventoryForm.addEventListener('submit',function(x){
         x.preventDefault();
-        console.log('Ok');
+      //  console.log('Ok');
        Inventory.createInventory();
       });
      
@@ -1997,10 +2165,10 @@ class Inventory {
         let d = JSON.parse(data);
         //console.log(d).id);
         if(d.id == 0){
-          message.innerHTML = `<center><h1 class="text-warning"><b>
+          message.innerHTML = `<center><h1 class="text-danger"><b>
           Register product first in Inventory Section
           </b></h1></center>
-          <input type="button" class="btn btn-outline-warning col-12 mt-2" onclick="Inventory.formInventory()" value="redirect to inventory section">`;
+          <input type="button" class="btn btn-outline-danger col-12 mt-2" onclick="Inventory.formInventory()" value="redirect to inventory section">`;
         } else {
           ////console.log(d));
           const getSupply = document.querySelector('#getSupply');
@@ -2112,11 +2280,527 @@ class Inventory {
       console.log(err);
     })
   }
+
+  //Discount
+  static formDiscount(){
+    message.innerHTML = '';
+    body.innerHTML = '';
+    title.innerHTML = `<b>Discount Section</b>`;
+    body.innerHTML = `
+    <form id="searchProduct" class="text-light">
+    <div class="form-group">
+    <label for="exampleInputEmail1"><b>Search Product</b></label>
+    <input type="text" autocomplete="off" class="form-control form-control-light text-light bg-dark" id="search" name="search" max="25" value="None">
+    </div>
+    </form>
+    
+    <form id="discountProduct" class="text-light">
+    
+    <div class="row">
+      <div class="col">
+        <div class="form-group">
+        <label for="exampleInputEmail1"><b>Name of Product</b></label>
+        <input type="hidden" id="id" name="id">
+        <input type="text" autocomplete="off" class="form-control form-control-light text-light bg-dark" id="name" value="None" disabled>
+        </div>
+    
+        <div class="form-group">
+        <label for="exampleInputEmail1"><b>Code of product</b></label>
+        <input type="text" autocomplete="off" class="form-control form-control-light text-light bg-dark" id="code" name="code" disabled>
+        </div>
+        
+        <div class="form-group">
+        <label for="exampleInputEmail1"><b>Vat(Rate %)</b></label>
+        <input type="text" autocomplete="off" class="form-control form-control-light text-light bg-dark" id="vat" name="vat">
+        </div>
+      </div>
+      <div class="col">  
+        <div class="form-group">
+        <label for="exampleInputEmail1"><b>Discount(Rate %)</b></label>
+        <input type="text" autocomplete="off" class="form-control form-control-light text-light bg-dark" id="discount" name="discount">
+        </div>
+        
+        <div class="form-group">
+        <label for="exampleInputEmail1"><b>Vatable</b></label>
+        <input type="text" autocomplete="off" class="form-control form-control-light text-light bg-dark" id="vatable" disabled>
+        </div>
+
+        <div class="form-group">
+        <label for="exampleInputEmail1"><b>Discountable</b></label>
+        <input type="text" autocomplete="off" class="form-control form-control-light text-light bg-dark" id="discountable" disabled>
+        </div>
+      </div>
+    </div>
+
+    <input type="submit" class="btn btn-outline-light col-12" id="btnSub" name="submit" value="Submit">
+    </form>
+    `;
+
+    const searchProduct = document.querySelector('#searchProduct');
+    const id = document.querySelector('#id');
+    const name = document.querySelector('#name');
+    const code = document.querySelector('#code');
+    const vat = document.querySelector('#vat');
+    const discount = document.querySelector('#discount');
+    const vatable = document.querySelector('#vatable');
+    const discountable = document.querySelector('#discountable');
+    const btnSub = document.querySelector('#btnSub');
+    btnSub.disabled = true;
+    searchProduct.addEventListener('keyup',(x)=>{
+      x.preventDefault();
+      const search = document.querySelector('#search').value;
+      let params = ['search=',search];
+
+      Main.postData('POST','HTTP/GET/inventory/searchinventory.php',params)
+      .then((data)=>{
+        let d = JSON.parse(data);
+        if(d.id == 0){
+          btnSub.disabled = true;
+          message.innerHTML = `<center><h1 class="text-danger"><b>
+          Register product first in Inventory Section
+          </b></h1></center>
+          <input type="button" class="btn btn-outline-danger col-12 mt-2" onclick="Inventory.formInventory()" value="redirect to inventory section">`;
+          return false;
+        }
+
+        if(search == 'None' || search == ''){
+        btnSub.disabled = true;
+         id.value = '';
+         name.value = 'None';
+         code.value  = '';
+         vat.value = '';
+         discount.value ='';
+         vatable.value = '';
+         discountable.value ='';
+          return false;
+        }
+        btnSub.disabled = false;
+        let vat_percent = d.vat * 100;
+        let discount_percent = d.discount * 100;
+        id.value = d.id;
+        name.value = d.name;
+        code.value = d.code;
+        vat.value = vat_percent;
+        discount.value = discount_percent;
+
+        vatable.value = parseFloat((d.price * d.vat) + d.price).toFixed(2);
+        discountable.value = parseFloat((vatable.value * d.discount) + vatable.value).toFixed(2);
+        
+
+        vat.addEventListener('keyup',(x)=>{
+      
+        vatable.value = parseFloat((d.price * (vat.value / 100)) + d.price).toFixed(2);
+        discountable.value = parseFloat(vatable.value - (vatable.value * (discount.value / 100))).toFixed(2);
+        });
+        discount.addEventListener('keyup',(x)=>{
+        vatable.value = parseFloat((d.price * (vat.value / 100)) + d.price).toFixed(2);
+        discountable.value = parseFloat(vatable.value - (vatable.value * (discount.value / 100))).toFixed(2);
+        });
+      });  
+    })
+
+    const discountProduct = document.querySelector('#discountProduct');
+    discountProduct.addEventListener('submit',(x)=>{
+    x.preventDefault();
+    let params = ['id=',id.value,'&vat=',vat.value,'&discount=',discount.value,
+    '&vatable=',vatable.value,'&discountable=',discountable.value];
+
+    Main.postData('POST','HTTP/POST/inventory/discount.php',params)
+    .then((data)=>{
+      if(data == 'success') {
+        message.innerHTML = '';
+        body.innerHTML = `<center><h1 class="text-light"><b>Successfully Sumbit</b></h1></center>
+          <input type="button" class="col-12 btn btn-outline-secondary mt-2" value="Back to discount section" onclick="Inventory.formDiscount()">`;
+        } else if(data == 'empty') {
+          message.innerHTML = `<center><h3 class="text-danger"><b>Please fill out all the forms</b></h3></center>`;
+        } 
+        else if(data == 'cannot') {
+          message.innerHTML = `<center><h3 class="text-danger"><b>Do not include any inappropriate characters</b></h3></center>`;
+        } else if(data == 'taken') {
+          message.innerHTML = `<center><h3 class="text-danger"><b>The value was taken</b></h3></center>`;
+        } else if(data == 'count') {
+          message.innerHTML = `<center><h3 class="text-danger"><b>Please follow the requirement of the field</b></h3></center>`;
+        }
+    })
+    .catch((err)=>{
+      console.log(err);
+    })
+    });
+
+  
+
+  }
+
+  //Fetch 
+  static fetchInventory(){
+    body.innerHTML = '';
+    message.innerHTML = '';
+    Inventory.DelModalInventory();
+    title.innerHTML = `<b>Inventory Table</b>`;
+    body.innerHTML += `
+    <div class="form-inline mb-3 mt-4">
+    <form id="searchForm">
+      <div class="form-group">
+        <div class="input-group-addon bg"><i id="lighten1" class="text-success fas fa-search"></i></div>
+        <input class="form-control form-control-success bg-dark text-success" type="text" autocomplete="off" name="search" id="search">
+
+        <div class="input-group-addon bg ml-2"><i id="lighten2" class="text-success fas fa-database"></i></div>
+        <input class="form-control form-control-success bg-dark text-success" type="text" autocomplete="off" name="val" id="val">
+        </div>
+        </form>
+
+    <form id="orderForm">
+    <div class="form-group">
+        <div class="text-light input-group-addon ml-2"><i id="lighten3" class="text-success fas fa-sort"></i></div>
+        <select class="form-control form-control-success bg-dark text-success" id="order" name="order">
+        <option value="DESC">DESCENDING ORDER</option>
+        <option value="ASC">ASCENDING ORDER</option>
+        </select>
+    </div>
+    </form>
+    </div>
+
+    <table class="table table-hover border-success">
+    <thead>
+      <tr class="table-success">
+        <th scope="col">Product Code</th>
+        <th scope="col">Product Name</th>
+        <th scope="col">Original Price</th>
+        <th scope="col">Release Price</th>
+        <th scope="col">Stock</th>
+      </tr>
+    </thead>
+    <tbody id="supply"></tbody>
+    </table>`;
+
+    const search = document.querySelector('#search').value; 
+    const val = document.querySelector('#val').value;
+    const order = document.querySelector('#order').value;
+    const params = ['search=',search,'&val=',val,'&order=',order]; 
+    
+
+    Main.postData('POST','HTTP/GET/inventory/fetchinventory.php',params)
+      .then((data)=>{
+        const supply = document.querySelector('#supply');  
+        supply.innerHTML = '';
+        let d = JSON.parse(data);
+        console.log(d);
+      for(let i = 0; i < d.name.length;i++){
+        if(d.id[i] == 0){
+          supply.innerHTML += `<tr class="table-default">
+          <th scope="row" style="width:17.5%">${d.code[i]}</th>
+          <td style="width:18.5%">${d.name[i]}</td>
+          <td style="width:20%">${d.price[i]}</td>
+          <td style="width:22.5%">${d.discountable[i]}</td>
+          <td style="width:22.5%">
+          no search found
+        </td>
+      </tr>`
+        } else {
+          supply.innerHTML += `<tr class="table-default">
+        <th scope="row" style="width:17.5%">${d.code[i]}</th>
+        <td style="width:18.5%">${d.name[i]}</td>
+        <td style="width:20%">${d.price[i]}</td>
+        <td style="width:22.5%">${d.discountable[i]}</td>
+        <td style="width:22.5%">
+        <i class="fas fa-edit text-danger faa-vertical animated-hover ml-2" onclick="Inventory.updateInventory('${d.code[i]}')"></i>
+        <i class="fas fa-trash-alt faa-wrench animated-hover text-warning ml-2" onclick="Supplier.delSessId(${d.id[i]})" data-toggle="modal" data-target="#del"></i>
+        <i class="fa fa-eye faa-pulse animated-hover text-info ml-2" onclick="Inventory.showInventory('${d.name[i]}')"></i>
+        </td>
+      </tr>`
+        }  
+      }
+    });
+
+    searchForm.addEventListener('keyup',(x)=>{
+      x.preventDefault();
+      const supply = document.querySelector('#supply');  
+      supply.innerHTML = '';
+      //console.log('response');
+      const search = document.querySelector('#search').value; 
+      const val = document.querySelector('#val').value;
+      const order = document.querySelector('#order').value;
+      const params = ['search=',search,'&val=',val,'&order=',order]; 
+      Main.postData('POST','HTTP/GET/inventory/fetchinventory.php',params)
+      .then((data)=>{
+        let d = JSON.parse(data);
+        console.log(d);
+        for(let i = 0; i < d.name.length;i++){
+          if(d.id[i] == 0){
+            supply.innerHTML += `<tr class="table-default">
+            <th scope="row" style="width:17.5%">${d.code[i]}</th>
+            <td style="width:18.5%">${d.name[i]}</td>
+            <td style="width:20%">${d.price[i]}</td>
+            <td style="width:22.5%">${d.discountable[i]}</td>
+            <td style="width:22.5%">
+            no search found
+          </td>
+        </tr>`
+          } else {
+            supply.innerHTML += `<tr class="table-default">
+          <th scope="row" style="width:17.5%">${d.code[i]}</th>
+          <td style="width:18.5%">${d.name[i]}</td>
+          <td style="width:20%">${d.price[i]}</td>
+          <td style="width:22.5%">${d.discountable[i]}</td>
+          <td style="width:22.5%">
+          <i class="fas fa-edit text-danger faa-vertical animated-hover ml-2" onclick="Inventory.updateInventory('${d.code[i]}')"></i>
+          <i class="fas fa-trash-alt faa-wrench animated-hover text-warning ml-2" onclick="Supplier.delSessId(${d.id[i]})" data-toggle="modal" data-target="#del"></i>
+          <i class="fa fa-eye faa-pulse animated-hover text-info ml-2" onclick="Inventory.showInventory('${d.name[i]}')"></i>
+          </td>
+        </tr>`
+          }  
+        }
+      })
+        .catch((err)=>{
+        console.log(err);
+        });
+    });
+
+    orderForm.addEventListener('change',(x)=>{
+    x.preventDefault();
+    const supply = document.querySelector('#supply');  
+    supply.innerHTML = '';
+    const search = document.querySelector('#search').value; 
+    const val = document.querySelector('#val').value;
+    const order = document.querySelector('#order').value;
+    const params = ['search=',search,'&val=',val,'&order=',order]; 
+    Main.postData('POST','HTTP/GET/inventory/fetchinventory.php',params)
+    .then((data)=>{
+      let d = JSON.parse(data);
+      for(let i = 0; i < d.name.length;i++){
+        if(d.id[i] == 0){
+          supply.innerHTML += `<tr class="table-default">
+          <th scope="row" style="width:17.5%">${d.code[i]}</th>
+          <td style="width:18.5%">${d.name[i]}</td>
+          <td style="width:20%">${d.price[i]}</td>
+          <td style="width:22.5%">${d.discountable[i]}</td>
+          <td style="width:22.5%">
+          no search found
+        </td>
+      </tr>`
+        } else {
+          supply.innerHTML += `<tr class="table-default">
+        <th scope="row" style="width:17.5%">${d.code[i]}</th>
+        <td style="width:18.5%">${d.name[i]}</td>
+        <td style="width:20%">${d.price[i]}</td>
+        <td style="width:22.5%">${d.discountable[i]}</td>
+        <td style="width:22.5%">
+        <i class="fas fa-edit text-danger faa-vertical animated-hover ml-2" onclick="Inventory.updateInventory('${d.code[i]}')"></i>
+        <i class="fas fa-trash-alt faa-wrench animated-hover text-warning ml-2" onclick="Supplier.delSessId(${d.id[i]})" data-toggle="modal" data-target="#del"></i>
+        <i class="fa fa-eye faa-pulse animated-hover text-info ml-2" onclick="Inventory.showInventory('${d.name[i]}')"></i>
+        </td>
+      </tr>`
+        }  
+      }
+    })
+    .catch((err)=>{
+      console.log(err);
+    });
+    });
+  }
+
+  static showInventory(g_id){
+    body.innerHTML = '';
+    title.innerHTML = `<b>Information Section</b>`;
+    message.innerHTML = '';
+
+    Main.getData('GET','HTTP/GET/inventory/show.php')
+    .then((data)=>{
+      console.log(g_id);
+      let d = JSON.parse(data);
+      let i = d.name.indexOf(g_id);
+
+      console.log(d);
+      const vat = d.vat[i] * 100;
+      const discount = d.discount[i] * 100;
+      body.innerHTML = `
+      <div class="text-success">
+      <h4><b>Registrar: </b>${d.registrar[i]}</h4>
+      <h4><b>Product Code: </b>${d.code[i]}</h4>
+      <h4><b>Product Name: </b>${d.name[i]}</h4>
+      <h4><b>Category: </b>${d.category[i]}</h4>
+      <h4><b>Description: </b>${d.description[i]}</h4>
+      <h4><b>Original Price: </b>${d.price[i]}</h4>
+      <h4><b>Vat: </b>${vat}%</h4>
+      <h4><b>Vatable: </b>${d.vatable[i]}</h4>
+      <h4><b>Discount: </b>${discount}%</h4>
+      <h4><b>Discountable: </b>${d.discountable[i]}</h4>
+      <h4><b>Created at: </b>${d.created_at[i]}</h4>
+      <h4><b>Updated at: </b>${d.updated_at[i]}</h4>
+      <input type="button" class="col-12 btn btn-outline-secondary mt-2" onclick="Inventory.fetchInventory()" value="Back">
+      </div>`; 
+    })
+    .catch(err=>{
+      console.log(err);
+    })
+  }
+
+  //Delete
+  static DelModalInventory(){
+    del.innerHTML = `
+    <div class="modal-dialog text-warning" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title"><i class="fas fa-exclamation-circle faa-bounce animated fa-md"></i> <b>Delete</b></h3>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete this item ?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-warning" onclick="Inventory.DeleteInventory()" data-dismiss="modal">Confirm</button>
+          <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  static DeleteInventory(){
+    let id = JSON.parse(sessionStorage.getItem('del_id'));
+    let params = ["hid="+id.del];
+    Main.postData('POST','HTTP/DELETE/inventory/delete.php',params)
+    .then((data)=>{
+      //console.log(d)ata);
+      if(data == 'cannot'){
+        message.innerHTML = `<center><h3 class="text-danger"><b>This item would not be delete because the stock is not empty</b></h3></center>`;
+      } else {
+       Inventory.fetchInventory();
+      }
+    })
+    .catch((err)=>{
+      console.log(err);
+    })
+    
+  }
+
+  // Update
+  static updateInventory(g_id){
+      message.innerHTML = '';
+      body.innerHTML = '';
+      title.innerHTML = `<b>Edit Section</b>`;
+      body.innerHTML = `<br><br><br>
+        <form id="inventoryForm" class="text-primary">
+          <div class="row">
+
+          <div class="col-6">
+
+        <div class="form-group">
+        <input type="hidden" name="uid" id="uid">
+        <label for="exampleInputEmail1"><b>Select Category</b></label>
+        <select class="bg-dark text-primary form-control" id="getCategory" name="getCategory">
+        </select>
+        </div>
+
+        <div class="form-group">
+        <label for="exampleInputEmail1"><b>Product Code</b></label>
+        <input class="bg-dark text-primary form-control" type="text" autocomplete="off" name="code" id="code" value="">
+        </div>
+
+        <div class="form-group">
+        <label for="exampleInputEmail1"><b>Product Name</b></label>
+        <input class="form-control bg-dark text-primary" type="text" autocomplete="off" name="name" id="name" value="">
+        </div>
+      
+      </div>
+
+      <div class="col-6 text-primary">
+
+        <div class="form-group">
+        <label for="exampleInputEmail1"><b>Product Description</b></label>
+        <textarea class="form-control bg-dark text-primary" name="description" id="description" style="height:123px;"></textarea>
+        </div>
+
+        <div class="form-group">
+        <label for="exampleInputEmail1"><b>Product Price</b></label>
+        <input class="form-control bg-dark text-primary" type="text" autocomplete="off" name="price" id="price" value="">
+        </div>
+
+        </div> 
+        <input type="submit" class="btn btn-outline-primary col-11 m-auto" id="btnSub" name="submit" value="Submit">
+        </div>
+        </form>`;
+
+        let getCategory = document.querySelector('#getCategory');
+        let code = document.querySelector('#code');
+        let name = document.querySelector('#name');
+        let description = document.querySelector('#description');
+        let price = document.querySelector('#price');
+        
+
+        Main.getData('GET','HTTP/GET/inventory/show.php')
+        .then((data)=>{
+        //  console.log(g_id);
+          let d = JSON.parse(data);
+          let i = d.code.indexOf(g_id);
+          code.value = d.code[i];
+          name.value = d.name[i];
+          description.value = d.description[i];
+          price.value = parseFloat(d.price[i].slice(2));
+          uid.value = d.id[i];
+
+          getCategory.innerHTML = `<option value="${d.category_id[i]}">${d.category[i]}</option>`;
+
+          getCategory.addEventListener('focus',(x)=>{
+            x.preventDefault();
+      
+            Main.getData('GET','HTTP/GET/inventory/getcategory.php')
+            .then((data)=>{
+              getCategory.innerHTML = '';
+              let d = JSON.parse(data);
+              for(let i = 0; i < d.category_id.length;i++){
+                getCategory.innerHTML += `<option value="${d.category_id[i]}">${d.category_name[i]}</option>`;
+              }
+              //////console.log(d));
+            }).catch((err)=>{
+              console.log(err);
+            })
+          .catch((err)=>{
+            console.log(err);
+          }); 
+          
+          })
+          
+        });
+
+          inventoryForm.addEventListener('submit',function(x){
+            x.preventDefault();
+          //  console.log('Ok');
+            console.log(code.value);
+            console.log(name.value);
+            console.log(price.value);
+            let params = ['uid=',uid.value,'&getCategory=',getCategory.value,'&code=',code.value,
+            '&name=',name.value,'&description=',description.value,'&price=',price.value];
+
+            Main.postData('POST','HTTP/PUT/inventory/update.php',params)
+            .then((data)=>{
+              console.log(data);
+            if(data == 'success') {
+              message.innerHTML = '';
+              body.innerHTML = `<center><h1 class="text-success"><b>Successfully Updated</b></h1></center>
+                <input type="button" class="col-12 btn btn-outline-secondary mt-2" value="Back to inventory section" onclick="Inventory.fetchInventory()">`;
+              } else if(data == 'empty') {
+                message.innerHTML = `<center><h3 class="text-danger"><b>Please fill out all the forms</b></h3></center>`;
+              } 
+              else if(data == 'cannot') {
+                message.innerHTML = `<center><h3 class="text-danger"><b>Do not include any inappropriate characters</b></h3></center>`;
+              } else if(data == 'taken') {
+                message.innerHTML = `<center><h3 class="text-danger"><b>The value was taken</b></h3></center>`;
+              } else if(data == 'count') {
+                message.innerHTML = `<center><h3 class="text-danger"><b>Please follow the requirement of the field</b></h3></center>`;
+              }
+        
+              })
+              .catch((err)=>{
+                console.log(err);
+              })
+
+          });
+  }
+
+
 }
-
-
-
-
 
 // Button 
 btnTodo.addEventListener('click',function(x){

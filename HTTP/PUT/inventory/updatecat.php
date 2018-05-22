@@ -1,12 +1,12 @@
 <?php
 
-if(!isset($_POST['category_name'])) {
+if(!isset($_POST['get_category'])) {
     header('Location: ../../../');
     exit(); 
 } else {
     require_once '../../../Process/model.php';
-    $category = $_POST['category_name'];
-
+    $category = $_POST['get_category'];
+    $id = $_POST['hid'];
     if(empty($category)) {
         echo 'empty';
         exit();
@@ -20,7 +20,7 @@ if(!isset($_POST['category_name'])) {
                 exit();
             } else {
                 $data = new InventoryModel();
-                $data->modelCreateCategory($category);
+                $data->modelUpdateCategory($id,$category);
             }
         }
     }
